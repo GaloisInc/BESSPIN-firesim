@@ -156,8 +156,6 @@ fpga: $(fpga_v) $(base_dir)/scripts/checkpoints/$(target_sim_tuple)
 # FPGA-level RTL Simulation #
 #############################
 
-FPGA_LEVEL_SIM_ARGS ?= $(COMMON_SIM_ARGS)
-
 # Run XSIM DUT
 xsim-dut: $(fpga_v) $(fpga_work_dir)/stamp
 	cd $(verif_dir)/scripts && $(MAKE) C_TEST=test_firesim
@@ -172,10 +170,6 @@ $(xsim): $(HEADER) $(DRIVER_CC) $(DRIVER_H) $(midas_cc) $(midas_h)
 	GEN_DIR=$(GENERATED_DIR) OUT_DIR=$(GENERATED_DIR) DRIVER="$(DRIVER_CC)"
 
 xsim: $(xsim)
-
-run-xsim: $(xsim)
-	cd $(dir $<) && ./$(notdir $<)  +permissive $(FPGA_LEVEL_SIM_ARGS) \
-	+sample=$(notdir $(SIM_BINARY)).sample  +permissive-off $(abspath $(SIM_BINARY))
 
 cleanfpga:
 	rm -rf $(fpga_work_dir)
