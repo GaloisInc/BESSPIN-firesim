@@ -107,7 +107,22 @@ firesim_top_t::firesim_top_t(int argc, char** argv)
                     MEMMODEL_0_W_num_registers,
                     (const unsigned int*) MEMMODEL_0_W_addrs,
                     (const char* const*) MEMMODEL_0_W_names),
-                argc, argv, "memory_stats.csv"));
+                argc, argv, "memory_stats_0.csv"));
+#endif
+
+// Add additional memory port to configure 2-tier mem system, 
+// If you want to add more ports, then put MEMMODEL_2/_3/...
+#ifdef MEMMODEL_1
+    fpga_models.push_back(new FpgaMemoryModel(
+                this,
+                // Casts are required for now since the emitted type can change...
+                AddressMap(MEMMODEL_1_R_num_registers,
+                    (const unsigned int*) MEMMODEL_1_R_addrs,
+                    (const char* const*) MEMMODEL_1_R_names,
+                    MEMMODEL_1_W_num_registers,
+                    (const unsigned int*) MEMMODEL_1_W_addrs,
+                    (const char* const*) MEMMODEL_1_W_names),
+                argc, argv, "memory_stats_1.csv"));
 #endif
 
     add_endpoint(new blockdev_t(this, args));

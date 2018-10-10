@@ -20,9 +20,14 @@ trait CanHaveMisalignedMasterAXI4MemPort { this: BaseSubsystem =>
   private val device = new MemoryDevice
   val nMemoryChannels: Int
 
+//  val memAXI4Node = AXI4SlaveNode(Seq.tabulate(nMemoryChannels) { channel =>
+//    val params = memPortParamsOpt.get
+//    val base = AddressSet.misaligned(params.base, params.size)
+
+// Memory channel offest & size definition for mulit-ports (nMemoryChannels)
   val memAXI4Node = AXI4SlaveNode(Seq.tabulate(nMemoryChannels) { channel =>
     val params = memPortParamsOpt.get
-    val base = AddressSet.misaligned(params.base, params.size)
+    val base = AddressSet.misaligned(params.base + ((channel*params.size)/nMemoryChannels), params.size/nMemoryChannels)
 
     AXI4SlavePortParameters(
       slaves = Seq(AXI4SlaveParameters(

@@ -99,6 +99,8 @@ class FireSimRocketChipTracedConfig extends Config(
 // single core config
 class FireSimRocketChipSingleCoreConfig extends Config(new FireSimRocketChipConfig)
 
+class FireSimRocketChipSingleCore2tierMEMConfig extends Config(new freechips.rocketchip.subsystem.WithNMemoryChannels(1) ++ new FireSimRocketChipSingleCoreConfig)
+
 class FireSimRocketChipSingleCoreTracedConfig extends Config(
   new WithTraceRocket ++ new FireSimRocketChipSingleCoreConfig)
 
