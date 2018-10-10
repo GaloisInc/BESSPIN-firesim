@@ -7,6 +7,7 @@ import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.tilelink.BootROMParams
 import boom.system.BoomTilesKey
 import testchipip.{WithBlockDevice, BlockDeviceKey, BlockDeviceConfig}
+//import testchipip.{WithBlockDevice, BlockDeviceKey, BlockDeviceConfig, MemBenchKey, MemBenchParams}
 import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTParams}
 import icenet._
 
@@ -65,6 +66,10 @@ class WithTraceRocket extends Config((site, here, up) => {
 class WithTraceBoom extends Config((site, here, up) => {
    case BoomTilesKey => up(BoomTilesKey, site) map { r => r.copy(trace = true) }
 })
+
+//class WithMemBenchKey extends Config((site, here, up) => {
+//  case MemBenchKey => MemBenchParams()
+//})
 
 /*******************************************************************************
 * Full TARGET_CONFIG configurations. These set parameters of the target being

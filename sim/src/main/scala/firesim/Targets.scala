@@ -62,7 +62,8 @@ class FireSimNoNIC(implicit p: Parameters) extends RocketSubsystem
     with HasNoDebug
     with HasPeripherySerial
     with HasPeripheryUART
-    with HasPeripheryBlockDevice
+    with HasPeripheryBlockDevice							// Sept./18, remove to check block device booting fail
+		//with HasPeripheryMemBench
 {
   val hasTraces = rocketTiles.map(_.rocketParams.trace).reduce(_ || _)
 
@@ -79,7 +80,7 @@ class FireSimNoNICModuleImp[+L <: FireSimNoNIC](l: L) extends RocketSubsystemMod
     with HasNoDebugModuleImp
     with HasPeripherySerialModuleImp
     with HasPeripheryUARTModuleImp
-    with HasPeripheryBlockDeviceModuleImp
+    with HasPeripheryBlockDeviceModuleImp						// Sept./18, remove to check block device booting fail
 
 class FireSimNoNICModuleImpTraced[+L <: FireSimNoNIC](l: L) extends FireSimNoNICModuleImp(l)
     with CanHaveRocketTraceIO

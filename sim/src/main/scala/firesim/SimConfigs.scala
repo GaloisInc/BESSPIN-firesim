@@ -12,6 +12,7 @@ import firesim.endpoints._
 object BaseParamsKey extends Field[BaseParams]
 object LlcKey extends Field[Option[LLCParams]]
 object DramOrganizationKey extends Field[DramOrganizationParams]
+object PCRAMOrganizationKey extends Field[PCRAMOrganizationParams]
 
 class WithSerialWidget extends Config((site, here, up) => {
   case midas.EndpointKey => up(midas.EndpointKey) ++
@@ -43,6 +44,7 @@ class WithDefaultMemModel extends Config((site, here, up) => {
   case LlcKey => None
   // Only used if a DRAM model is requested
   case DramOrganizationKey => DramOrganizationParams(maxBanks = 8, maxRanks = 4, dramSize = BigInt(1) << 34)
+	case PCRAMOrganizationKey => PCRAMOrganizationParams(maxBanks = 16, maxRanks = 4, maxActBanks = 12, maxWriteBanks = 8, pcramSize = BigInt(1) << 34)
   // Default to a Latency-Bandwidth Pipe without and LLC model
   case BaseParamsKey => new BaseParams(
     maxReads = 16,
@@ -78,6 +80,18 @@ class WithDramOrganization(maxRanks: Int, maxBanks: Int, dramSize: BigInt)
   )
 })
 
+// Changes the default PCRAM memory organization.
+class WithPCRAMOrganization(maxRanks: Int, maxBanks: Int, maxActBanks: Int, maxWriteBanks: Int, pcramSize: BigInt)
+    extends Config((site, here, up) => {
+  case PCRAMOrganizationKey => site(PCRAMOrganizationKey).copy(
+    maxBanks = maxBanks,
+    maxRanks = maxRanks,
+    maxActBanks = maxActBanks,
+    maxWriteBanks = maxWriteBanks,
+    pcramSize = pcramSize
+  )
+})
+
 
 // Instantiates a DDR3 model with a FCFS memory access scheduler
 class WithDDR3FIFOMAS(queueDepth: Int) extends Config((site, here, up) => {
@@ -99,6 +113,18 @@ class WithDDR3FRFCFS(windowSize: Int, queueDepth: Int) extends Config((site, her
       baseParams = site(BaseParamsKey)))(p))
   }
 )
+
+// Instatiates a PCRAM FRFCFS model 
+class WithPCRAMFRFCFS (windowSize: Int, queueDepth: Int) extends Config((site, here, up) => {
+  case MemModelKey => Some((p: Parameters) => new MidasMemModel(
+    new PCRAMModelConfig(
+      schedulerWindowSize = windowSize,
+      transactionQueueDepth = queueDepth,
+      pcramKey = site(PCRAMOrganizationKey),
+      baseParams = site(BaseParamsKey)))(p))
+  }
+)
+
 
 // Changes the functional model capacity limits
 class WithFuncModelLimits(maxReads: Int, maxWrites: Int) extends Config((site, here, up) => {
@@ -131,6 +157,15 @@ class FRFCFS16GBQuadRank extends Config(
 class FRFCFS16GBQuadRankLLC4MB extends Config(
   new WithLLCModel(4096, 8) ++
   new FRFCFS16GBQuadRank
+)
+
+// PCRAM FRFCFS models
+class PCRAMFRFCFS extends Config(
+  new WithPCRAMFRFCFS(8, 8) ++ new FireSimConfig
+)
+class PCRAMFRFCFSLLC1MB extends Config(
+  new WithLLCModel(4096, 8) ++
+  new PCRAMFRFCFS
 )
 
 /*******************************************************************************
@@ -181,4 +216,20 @@ class FireSimDDR3FRFCFSLLC4MBConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FRFCFS16GBQuadRankLLC4MB ++
+  new midas.F1Config)
+
+class FireSimPCRAMFRFCFSConfig extends Config(
+  new WithSerialWidget ++
+  new WithUARTWidget ++
+  new WithSimpleNICWidget ++
+  new WithBlockDevWidget ++
+  new PCRAMFRFCFS ++
+  new midas.F1Config)
+
+class FireSimPCRAMFRFCFSLLC1MBConfig extends Config(
+  new WithSerialWidget ++
+  new WithUARTWidget ++
+  new WithSimpleNICWidget ++
+  new WithBlockDevWidget ++
+  new PCRAMFRFCFSLLC1MB ++
   new midas.F1Config)
