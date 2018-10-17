@@ -2,6 +2,7 @@
   "benchmark_name" : "bw-test-one-instance",
   "common_simulation_outputs" : ["uartlog"],
   "common_rootfs" : "dummy.ext2",
+  "post_run_hook" : "python ../net-bw-calc.py --nodes=8",
   "workloads" : [
     {
       "name" : "client-0",
