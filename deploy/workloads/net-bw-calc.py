@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import argparse
+import glob
 
 from itertools import product
 from collections import defaultdict
@@ -18,17 +19,21 @@ def parse_log(f):
             data.append((int(tss), int(lens), int(sender), int (receiver)))
     return data
 
-def compute_bw(packet_data, timestep, freq, bitwidth, last_ts, n):
+def compute_bw(packet_data, timestep, freq, bitwidth):
+    last_ts = packet_data[-1][0]
+    last_node = 0
     end_ts = (last_ts // timestep) * timestep
     cycles = range(0, end_ts + 1, timestep)
-    send_totals = defaultdict(lambda: [0 for _ in range(0, n)])
-    recv_totals = defaultdict(lambda: [0 for _ in range(0, n)])
+    send_totals = defaultdict(lambda: defaultdict(int))
+    recv_totals = defaultdict(lambda: defaultdict(int))
 
     for (ts, plen, psend, precv) in packet_data:
         send_totals[ts // timestep][psend] += plen
         recv_totals[ts // timestep][precv] += plen
+        last_node = max(last_node, max(psend, precv))
 
     cycles_per_milli = freq * 1e6
+    n = last_node + 1
 
     result = []
 
@@ -47,7 +52,7 @@ def compute_bw(packet_data, timestep, freq, bitwidth, last_ts, n):
 
         result.append(datarow)
 
-    return result
+    return n, result
 
 def main():
     parser = argparse.ArgumentParser(description="Plot bandwidth over time")
@@ -58,16 +63,17 @@ def main():
                         default = 3.2, help = "Clock frequency (in GHz)")
     parser.add_argument("--bitwidth", dest="bitwidth", type=int,
                         default = 64, help = "Width of interface (in bits)")
-    parser.add_argument("--nodes", dest="nodes", type=int,
-                        default = 8, help = "Number of nodes on each switch")
-    parser.add_argument("--switches", dest="switches", type=int,
-                        default = 1, help = "Number of switches")
     parser.add_argument("workdir", help="Working directory")
     args = parser.parse_args()
 
-    for i in range(0, args.switches):
-        switchlog = os.path.join(args.workdir, "switch{}/switchlog".format(i))
-        outfile = os.path.join(args.workdir, "result{}.csv".format(i))
+    switchlogs = glob.glob(os.path.join(args.workdir, "switch*/switchlog"))
+    switchlogs.sort()
+
+    for switchlog in switchlogs:
+        switchname = os.path.basename(os.path.dirname(switchlog))
+        switchnum = int(switchname[6:])
+        outfile = os.path.join(args.workdir, "result{}.csv".format(switchnum))
+        nnodes = 0
 
         with open(switchlog) as f:
             raw_data = parse_log(f)
@@ -75,17 +81,14 @@ def main():
                 sys.stderr.write("Error: no data found\n")
                 sys.exit(-1)
 
-            last_ts = raw_data[-1][0]
-
-            result = compute_bw(
-                raw_data, args.timestep, args.freq, args.bitwidth,
-                last_ts, args.nodes)
+            nnodes, result = compute_bw(
+                raw_data, args.timestep, args.freq, args.bitwidth)
 
         with open(outfile, "w") as f:
             writer = csv.writer(f)
             titles = ["Time (ms)"]
 
-            for node in range(0, args.nodes):
+            for node in range(0, nnodes):
                 titles.append("Send BW {}".format(node))
                 titles.append("Recv BW {}".format(node))
 
