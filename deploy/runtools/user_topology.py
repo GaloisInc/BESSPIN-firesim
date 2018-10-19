@@ -118,8 +118,27 @@ class UserTopologies(object):
         self.clos_m_n_r_supernode(4, 4, 8)
 
 
+    ## full size clos topols for when we can get 32 f1.16xlarges
+    def clos_8_8_128_supernode(self):
+        """ clos topol with:
+        8 roots
+        8 nodes/leaf
+        128 leaves. = 1024 nodes."""
+        self.clos_m_n_r_supernode(8, 8, 128)
 
+    def clos_8_4_256_supernode(self):
+        """ clos topol with:
+        8 roots
+        4 nodes/leaf
+        256 leaves. = 1024 nodes."""
+        self.clos_m_n_r_supernode(8, 4, 256)
 
+    def clos_16_16_64_supernode(self):
+        """ clos topol with:
+        16 roots
+        16 nodes/leaf
+        64 leaves. = 1024 nodes."""
+        self.clos_m_n_r_supernode(16, 16, 64)
 
 
 
