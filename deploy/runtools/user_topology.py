@@ -140,6 +140,51 @@ class UserTopologies(object):
         64 leaves. = 1024 nodes."""
         self.clos_m_n_r_supernode(16, 16, 64)
 
+    ## half size clos topols for when we can only get 16 f1.16xlarges
+    def clos_4_8_64_supernode(self):
+        """ clos topol with:
+        4 roots
+        8 nodes/leaf
+        64 leaves. = 512 nodes."""
+        self.clos_m_n_r_supernode(4, 8, 64)
+
+    def clos_4_4_128_supernode(self):
+        """ clos topol with:
+        4 roots
+        4 nodes/leaf
+        128 leaves. = 512 nodes."""
+        self.clos_m_n_r_supernode(4, 4, 128)
+
+    def clos_8_16_32_supernode(self):
+        """ clos topol with:
+        8 roots
+        16 nodes/leaf
+        32 leaves. = 512 nodes."""
+        self.clos_m_n_r_supernode(8, 16, 32)
+
+    ## quarter size clos topols for when we can only get 8 f1.16xlarges
+    def clos_2_8_32_supernode(self):
+        """ clos topol with:
+        2 roots
+        8 nodes/leaf
+        32 leaves. = 256 nodes."""
+        self.clos_m_n_r_supernode(2, 8, 32)
+
+    def clos_2_4_64_supernode(self):
+        """ clos topol with:
+        2 roots
+        4 nodes/leaf
+        64 leaves. = 256 nodes."""
+        self.clos_m_n_r_supernode(2, 4, 64)
+
+    def clos_4_16_16_supernode(self):
+        """ clos topol with:
+        4 roots
+        16 nodes/leaf
+        16 leaves. = 256 nodes."""
+        self.clos_m_n_r_supernode(4, 16, 16)
+
+
 
 
     def fat_tree_4ary(self):
