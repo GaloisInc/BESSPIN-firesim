@@ -88,7 +88,11 @@ check-rtc-linux:
 	python gen-benchmark-rootfs.py -w $@.json -r -b ../../sw/firesim-software/rootfs0.ext2 -s $@/overlay
 
 all-reduce-8:
-	cd ../../sw/network-benchmarks/all-reduce && make clean && make NCOMPUTE=7
+	cd ../../sw/network-benchmarks/all-reduce && make clean && make NCOMPUTE=7 NBYTES=200000L PAUSE_MS=16 NROUNDS=3
 	cp ../../sw/network-benchmarks/all-reduce/{averager,compute}.riscv $@
 
-.PHONY: $(spec17_overlays) $(spec17_rootfs_dirs) gapbs fedora-uniform memcached-thread-imbalance bw-test-one-instance bw-test-two-instances ping-latency simperf-test simperf-test-latency simperf-test-scale iperf3 check-rtc check-rtc-linux allpaper all-reduce-8
+ring-reduce-8:
+	cd ../../sw/network-benchmarks/ring-reduce && make clean && make NCOMPUTE=8 NBYTES=200000L PAUSE_MS=16 NROUNDS=3
+	cp ../../sw/network-benchmarks/ring-reduce/ring.riscv $@
+
+.PHONY: $(spec17_overlays) $(spec17_rootfs_dirs) gapbs fedora-uniform memcached-thread-imbalance bw-test-one-instance bw-test-two-instances ping-latency simperf-test simperf-test-latency simperf-test-scale iperf3 check-rtc check-rtc-linux allpaper all-reduce-8 ring-reduce-8
