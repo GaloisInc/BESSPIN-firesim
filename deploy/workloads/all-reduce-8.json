@@ -1,0 +1,56 @@
+{
+  "benchmark_name" : "all-reduce-8",
+  "common_simulation_outputs" : ["uartlog"],
+  "common_rootfs" : "dummy.ext2",
+  "post_run_hook" : "python ../net-bw-calc.py",
+  "workloads" : [
+    {
+      "name" : "averager",
+      "bootbinary" : "averager.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-1",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-2",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-3",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-4",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-5",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-6",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "compute-7",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    }
+  ]
+}

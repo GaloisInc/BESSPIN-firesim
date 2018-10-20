@@ -1,0 +1,56 @@
+{
+  "benchmark_name" : "ring-reduce-8",
+  "common_simulation_outputs" : ["uartlog"],
+  "common_rootfs" : "dummy.ext2",
+  "post_run_hook" : "python ../net-bw-calc.py",
+  "workloads" : [
+    {
+      "name" : "ring-0",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-1",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-2",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-3",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-4",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-5",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-6",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "ring-7",
+      "bootbinary" : "ring.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    }
+  ]
+}
