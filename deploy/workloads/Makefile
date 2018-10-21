@@ -110,4 +110,4 @@ ring-reduce-256:
 
 
 
-.PHONY: $(spec17_overlays) $(spec17_rootfs_dirs) gapbs fedora-uniform memcached-thread-imbalance bw-test-one-instance bw-test-two-instances ping-latency simperf-test simperf-test-latency simperf-test-scale iperf3 check-rtc check-rtc-linux allpaper all-reduce-8 ring-reduce-8
+.PHONY: $(spec17_overlays) $(spec17_rootfs_dirs) gapbs fedora-uniform memcached-thread-imbalance bw-test-one-instance bw-test-two-instances ping-latency simperf-test simperf-test-latency simperf-test-scale iperf3 check-rtc check-rtc-linux allpaper all-reduce-8 ring-reduce-8 all-reduce-256 ring-reduce-256 bw-test-eight-instances
