@@ -1,0 +1,1582 @@
+{
+  "benchmark_name" : "all-reduce-256",
+  "common_simulation_outputs" : ["uartlog"],
+  "common_rootfs" : "dummy.ext2",
+  "post_run_hook" : "python ../net-bw-calc.py",
+  "workloads" : [
+    {
+      "name" : "averager",
+      "bootbinary" : "averager.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH1",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH2",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH3",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH4",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH5",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH6",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH7",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH8",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH9",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH10",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH11",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH12",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH13",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH14",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH15",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH16",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH17",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH18",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH19",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH20",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH21",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH22",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH23",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH24",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH25",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH26",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH27",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH28",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH29",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH30",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH31",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH32",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH33",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH34",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH35",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH36",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH37",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH38",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH39",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH40",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH41",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH42",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH43",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH44",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH45",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH46",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH47",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH48",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH49",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH50",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH51",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH52",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH53",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH54",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH55",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH56",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH57",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH58",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH59",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH60",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH61",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH62",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH63",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+
+    {
+      "name" : "computeDASH64",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH65",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH66",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH67",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH68",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH69",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH70",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH71",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH72",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH73",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH74",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH75",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH76",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH77",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH78",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH79",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH80",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH81",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH82",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH83",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH84",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH85",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH86",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH87",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH88",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH89",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH90",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH91",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH92",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH93",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH94",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH95",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH96",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH97",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH98",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH99",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH100",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH101",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH102",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH103",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH104",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH105",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH106",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH107",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH108",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH109",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH110",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH111",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH112",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH113",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH114",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH115",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH116",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH117",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH118",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH119",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH120",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH121",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH122",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH123",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH124",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH125",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH126",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH127",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH128",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH129",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH130",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH131",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH132",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH133",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH134",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH135",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH136",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH137",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH138",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH139",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH140",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH141",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH142",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH143",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH144",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH145",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH146",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH147",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH148",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH149",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH150",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH151",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH152",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH153",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH154",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH155",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH156",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH157",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH158",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH159",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH160",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH161",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH162",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH163",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH164",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH165",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH166",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH167",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH168",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH169",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH170",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH171",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH172",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH173",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH174",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH175",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH176",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH177",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH178",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH179",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH180",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH181",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH182",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH183",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH184",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH185",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH186",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH187",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH188",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH189",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH190",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH191",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+
+    {
+      "name" : "computeDASH192",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH193",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH194",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH195",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH196",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH197",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH198",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH199",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH200",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH201",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH202",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH203",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH204",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH205",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH206",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH207",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH208",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH209",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH210",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH211",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH212",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH213",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH214",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH215",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH216",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH217",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH218",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH219",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH220",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH221",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH222",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH223",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH224",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH225",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH226",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH227",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH228",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH229",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH230",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH231",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH232",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH233",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH234",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH235",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH236",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH237",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH238",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH239",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH240",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH241",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH242",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH243",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH244",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH245",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH246",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH247",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+
+    {
+      "name" : "computeDASH248",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH249",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH250",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH251",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH252",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH253",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH254",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH255",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    },
+    {
+      "name" : "computeDASH256",
+      "bootbinary" : "compute.riscv",
+      "simulation_outputs": [],
+      "outputs" : []
+    }
+  ]
+}
