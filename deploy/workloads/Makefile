@@ -65,6 +65,10 @@ bw-test-one-instance: bw-test-one-instance.json
 	cd ../../sw/network-benchmarks && python build-bw-test.py -n 4
 	cp ../../sw/network-benchmarks/testbuild/*.riscv $@
 
+bw-test-one-instance-supernode: bw-test-one-instance-supernode.json
+	cd ../../sw/network-benchmarks && python build-bw-test.py -n 16 -s 2000000
+	cp ../../sw/network-benchmarks/testbuild/*.riscv $@
+
 ping-latency:
 	mkdir -p $@
 	python gen-benchmark-rootfs.py -w $@.json -r -b ../../sw/firesim-software/rootfs0.ext2 -s $@/overlay
@@ -110,4 +114,4 @@ ring-reduce-256:
 
 
 
-.PHONY: $(spec17_overlays) $(spec17_rootfs_dirs) gapbs fedora-uniform memcached-thread-imbalance bw-test-one-instance bw-test-two-instances ping-latency simperf-test simperf-test-latency simperf-test-scale iperf3 check-rtc check-rtc-linux allpaper all-reduce-8 ring-reduce-8 all-reduce-256 ring-reduce-256 bw-test-eight-instances
+.PHONY: $(spec17_overlays) $(spec17_rootfs_dirs) gapbs fedora-uniform memcached-thread-imbalance bw-test-one-instance bw-test-two-instances bw-test-one-instance-supernode ping-latency simperf-test simperf-test-latency simperf-test-scale iperf3 check-rtc check-rtc-linux allpaper all-reduce-8 ring-reduce-8 all-reduce-256 ring-reduce-256 bw-test-eight-instances

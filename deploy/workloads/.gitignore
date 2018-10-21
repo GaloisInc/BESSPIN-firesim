@@ -9,6 +9,7 @@ check-rtc-linux
 bw-test-one-instance/*.riscv
 bw-test-two-instances/*.riscv
 bw-test-eight-instances/*.riscv
+bw-test-one-instance-supernode/*.riscv
 all-reduce-8/*.riscv
 ring-reduce-8/*.riscv
 all-reduce-256/averager.riscv
