@@ -100,11 +100,11 @@ ring-reduce-8:
 	cp ../../sw/network-benchmarks/ring-reduce/ring.riscv $@
 
 all-reduce-256:
-	cd ../../sw/network-benchmarks/all-reduce && make clean && make NCOMPUTE=255 NBYTES=200000000L PAUSE_MS=16 NROUNDS=3
+	cd ../../sw/network-benchmarks/all-reduce && make clean && make NCOMPUTE=255 NBYTES=20000000L PAUSE_MS=16 NROUNDS=1
 	cp ../../sw/network-benchmarks/all-reduce/{averager,compute}.riscv $@
 
 ring-reduce-256:
-	cd ../../sw/network-benchmarks/ring-reduce && make clean && make NCOMPUTE=256 NBYTES=200000000L PAUSE_MS=16 NROUNDS=3
+	cd ../../sw/network-benchmarks/ring-reduce && make clean && make NCOMPUTE=256 NBYTES=20000000L PAUSE_MS=16 NROUNDS=1
 	cp ../../sw/network-benchmarks/ring-reduce/ring.riscv $@
 
 
