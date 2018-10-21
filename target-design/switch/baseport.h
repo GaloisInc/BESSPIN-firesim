@@ -90,9 +90,8 @@ void BasePort::write_flits_to_output() {
             outputqueue.pop();
             //printf("intended timestamp: %ld, actual timestamp: %ld, diff %ld\n", outputtimestamp, basetime + flitswritten, (int64_t)(basetime + flitswritten) - (int64_t)(outputtimestamp));
             // for root switch BW logging
-            printf("packet timestamp: %ld, len: %ld, sender: %d, receiver: %d\n",
-		basetime + flitswritten, thispacket->amtwritten,
-		thispacket->sender, _portNo);
+            printf("packet timestamp: %ld, len: %ld, receiver: %d\n",
+		basetime + flitswritten, thispacket->amtwritten, _portNo);
             for (int i = 0; i < thispacket->amtwritten; i++) {
                 write_last_flit(current_output_buf, flitswritten, i == (thispacket->amtwritten-1));
                 write_valid_flit(current_output_buf, flitswritten);

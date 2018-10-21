@@ -8,15 +8,15 @@ import glob
 from itertools import product
 from collections import defaultdict
 
-DATA_RE = re.compile(r"^packet timestamp: (\d+), len: (\d+), sender: (\d+), receiver: (\d+)$")
+DATA_RE = re.compile(r"^packet timestamp: (\d+), len: (\d+), (sender|receiver): (\d+)$")
 
 def parse_log(f):
     data = []
     for line in f:
         match = DATA_RE.match(line.strip())
         if match:
-            tss, lens, sender, receiver = match.groups()
-            data.append((int(tss), int(lens), int(sender), int (receiver)))
+            tss, lens, send_receive, node = match.groups()
+            data.append((int(tss), int(lens), send_receive == "sender", int(node)))
     return data
 
 def compute_bw(packet_data, timestep, freq, bitwidth):
@@ -27,10 +27,12 @@ def compute_bw(packet_data, timestep, freq, bitwidth):
     send_totals = defaultdict(lambda: defaultdict(int))
     recv_totals = defaultdict(lambda: defaultdict(int))
 
-    for (ts, plen, psend, precv) in packet_data:
-        send_totals[ts // timestep][psend] += plen
-        recv_totals[ts // timestep][precv] += plen
-        last_node = max(last_node, max(psend, precv))
+    for (ts, plen, is_send, node) in packet_data:
+        if is_send:
+            send_totals[ts // timestep][node] += plen
+        else:
+            recv_totals[ts // timestep][node] += plen
+        last_node = max(last_node, node)
 
     cycles_per_milli = freq * 1e6
     n = last_node + 1

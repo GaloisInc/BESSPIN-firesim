@@ -96,6 +96,7 @@ for (int port = 0; port < NUMPORTS; port++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint64_t flit = get_flit(input_port_buf, tokenno);
 
+
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
                 sp = (switchpacket*)calloc(sizeof(switchpacket), 1);
@@ -111,6 +112,10 @@ for (int port = 0; port < NUMPORTS; port++) {
             if (is_last_flit(input_port_buf, tokenno)) {
                 current_port->inputqueue.push(sp);
                 current_port->input_in_progress = NULL;
+
+                printf("packet timestamp: %ld, len: %ld, sender: %d\n",
+                        this_iter_cycles_start + tokenno,
+                        sp->amtwritten, port);
             }
         }
     }
