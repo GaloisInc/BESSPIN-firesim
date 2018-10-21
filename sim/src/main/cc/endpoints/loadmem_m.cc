@@ -39,7 +39,6 @@ void loadmem_m::read_mem(size_t addr, mpz_t& value) {
 }
 
 void loadmem_m::write_mem(size_t addr, mpz_t& value, size_t bytes) {
-  printf("I entered loadmem_m::write_mem\n");
   write("W_ADDRESS_H", addr >> 32);
   write("W_ADDRESS_L", addr & ((1ULL << 32) - 1));
   size_t num_beats = (bytes + (MEM_DATA_CHUNK*sizeof(data_t)))/(MEM_DATA_CHUNK*sizeof(data_t));
