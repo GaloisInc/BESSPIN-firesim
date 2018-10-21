@@ -58,7 +58,7 @@ bw-test-two-instances: bw-test-two-instances.json
 	cp ../../sw/network-benchmarks/testbuild/*.riscv $@
 
 bw-test-eight-instances: bw-test-eight-instances.json
-	cd ../../sw/network-benchmarks && python build-bw-test.py -n 128 -s 200000
+	cd ../../sw/network-benchmarks && python build-bw-test.py -n 128 -s 2000000
 	cp ../../sw/network-benchmarks/testbuild/*.riscv $@
 
 bw-test-one-instance: bw-test-one-instance.json
