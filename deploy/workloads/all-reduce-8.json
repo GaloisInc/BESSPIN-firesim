@@ -2,7 +2,7 @@
   "benchmark_name" : "all-reduce-8",
   "common_simulation_outputs" : ["uartlog"],
   "common_rootfs" : "dummy.ext2",
-  "post_run_hook" : "python ../net-bw-calc.py",
+  "post_run_hook" : "../compute-bw-results.sh",
   "workloads" : [
     {
       "name" : "averager",

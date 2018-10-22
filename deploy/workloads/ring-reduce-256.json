@@ -2,6 +2,6 @@
   "benchmark_name" : "ring-reduce-256",
   "common_simulation_outputs" : ["uartlog"],
   "common_rootfs" : "dummy.ext2",
-  "post_run_hook" : "python ../net-bw-calc.py",
+  "post_run_hook" : "../compute-bw-results.sh",
   "common_bootbinary": "ring.riscv"
 }

@@ -3,7 +3,7 @@
   "comment"        : "this is for eight supernode 16xlarges",
   "common_simulation_outputs" : ["uartlog"],
   "common_rootfs" : "dummy.ext2",
-  "post_run_hook" : "python ../net-bw-calc.py --timestep=10000",
+  "post_run_hook" : "../compute-bw-results.sh",
   "workloads" : [
     {
       "name" : "client-0",
