@@ -104,6 +104,9 @@ class WithDDR3FIFOMAS(queueDepth: Int) extends Config((site, here, up) => {
 
 // Instantiates a DDR3 model with a FR-FCFS memory access scheduler
 // windowSize = Maximum number of references the MAS can schedule across
+//class WithHeteroMemModel(windowSize: Int, queueDepth: Int) extends Config((site, here, up) _=> {
+//  case MemModelKey => Seq((p: Parameters) => new MidasMemModel(
+
 class WithDDR3FRFCFS(windowSize: Int, queueDepth: Int) extends Config((site, here, up) => {
   case MemModelKey => Some((p: Parameters) => new MidasMemModel(
     new FirstReadyFCFSConfig(
@@ -118,8 +121,8 @@ class WithDDR3FRFCFS(windowSize: Int, queueDepth: Int) extends Config((site, her
 class WithPCRAMFRFCFS (windowSize: Int, queueDepth: Int) extends Config((site, here, up) => {
   case MemModelKey => Some((p: Parameters) => new MidasMemModel(
     new PCRAMModelConfig(
-      schedulerWindowSize = windowSize,
-      transactionQueueDepth = queueDepth,
+      pcramSchedulerWindowSize = windowSize,
+      pcramTransactionQueueDepth = queueDepth,
       pcramKey = site(PCRAMOrganizationKey),
       baseParams = site(BaseParamsKey)))(p))
   }
