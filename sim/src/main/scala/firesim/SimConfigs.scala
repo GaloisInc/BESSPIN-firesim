@@ -1,6 +1,8 @@
 package firesim.firesim
 
 import freechips.rocketchip.config.{Parameters, Config, Field}
+// Introspect on the target's config to get the number of memory channels.
+import freechips.rocketchip.subsystem.{BankedL2Key}
 
 import midas.models._
 import midas.MemModelKey
@@ -54,7 +56,7 @@ class WithDefaultMemModel extends Config((site, here, up) => {
     beatCounters = true,
     llcKey = site(LlcKey))
 
-	case MemModelKey => Some((p: Parameters) => new MidasMemModel(new
+	case MemModelKey => Seq.fill(site(BankedL2Key).nMemoryChannels)((p: Parameters) => new MidasMemModel(new
 		LatencyPipeConfig(site(BaseParamsKey)))(p))
 })
 
@@ -95,7 +97,7 @@ class WithPCRAMOrganization(maxRanks: Int, maxBanks: Int, maxActBanks: Int, maxW
 
 // Instantiates a DDR3 model with a FCFS memory access scheduler
 class WithDDR3FIFOMAS(queueDepth: Int) extends Config((site, here, up) => {
-  case MemModelKey => Some((p: Parameters) => new MidasMemModel(
+  case MemModelKey => Seq.fill(site(BankedL2Key).nMemoryChannels)((p: Parameters) => new MidasMemModel(
     new FIFOMASConfig(
       transactionQueueDepth = queueDepth,
       dramKey = site(DramOrganizationKey),
@@ -108,7 +110,7 @@ class WithDDR3FIFOMAS(queueDepth: Int) extends Config((site, here, up) => {
 //  case MemModelKey => Seq((p: Parameters) => new MidasMemModel(
 
 class WithDDR3FRFCFS(windowSize: Int, queueDepth: Int) extends Config((site, here, up) => {
-  case MemModelKey => Some((p: Parameters) => new MidasMemModel(
+  case MemModelKey => Seq.fill(site(BankedL2Key).nMemoryChannels)((p: Parameters) => new MidasMemModel(
     new FirstReadyFCFSConfig(
       schedulerWindowSize = windowSize,
       transactionQueueDepth = queueDepth,
@@ -119,7 +121,7 @@ class WithDDR3FRFCFS(windowSize: Int, queueDepth: Int) extends Config((site, her
 
 // Instatiates a PCRAM FRFCFS model 
 class WithPCRAMFRFCFS (windowSize: Int, queueDepth: Int) extends Config((site, here, up) => {
-  case MemModelKey => Some((p: Parameters) => new MidasMemModel(
+  case MemModelKey => Seq.fill(site(BankedL2Key).nMemoryChannels)((p: Parameters) => new MidasMemModel(
     new PCRAMModelConfig(
       pcramSchedulerWindowSize = windowSize,
       pcramTransactionQueueDepth = queueDepth,
@@ -131,10 +133,19 @@ class WithPCRAMFRFCFS (windowSize: Int, queueDepth: Int) extends Config((site, h
 
 // Changes the functional model capacity limits
 class WithFuncModelLimits(maxReads: Int, maxWrites: Int) extends Config((site, here, up) => {
-  case BaseParamsKey => up(BaseParamsKey).copy(
+  case BaseParamsKey => up(BaseParamsKey, site).copy(
     maxReads = maxReads,
     maxWrites = maxWrites
   )
+})
+
+// Generate a different memory model instance for each memory channel.
+// This is imperfect in that each config needs to contain a complete and
+// isolated parameterization for the memory model instance
+class WithHeterogenousMemoryChannels(cfgs: Seq[Config]) extends Config((site, here, up) => {
+  case MemModelKey =>
+    require(site(BankedL2Key).nMemoryChannels == cfgs.size, "Must provide a config for each memory channel")
+    cfgs.map(cfg => cfg(MemModelKey).head)
 })
 
 /*******************************************************************************
@@ -235,4 +246,12 @@ class FireSimPCRAMFRFCFSLLC1MBConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new PCRAMFRFCFSLLC1MB ++
+  new midas.F1Config)
+
+class FireSimHybridPCRAMDRAMConfig extends Config(
+  new WithSerialWidget ++
+  new WithUARTWidget ++
+  new WithSimpleNICWidget ++
+  new WithBlockDevWidget ++
+  new WithHeterogenousMemoryChannels(Seq(new FRFCFS16GBQuadRank, new PCRAMFRFCFS)) ++
   new midas.F1Config)
