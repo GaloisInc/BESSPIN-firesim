@@ -47,6 +47,7 @@ common_ld_flags := $(TARGET_LD_FLAGS) -lrt
 # Golden Gate Invocation           #
 ####################################
 midas_sbt_project := {file:$(firesim_base_dir)}midas
+firesimLib_sbt_project := {file:${firesim_base_dir}/}firesimLib
 
 $(VERILOG) $(HEADER): $(FIRRTL_FILE) $(ANNO_FILE)
 	cd $(base_dir) && $(SBT) "project $(midas_sbt_project)" "runMain midas.stage.GoldenGateMain \
@@ -223,12 +224,6 @@ xsim: $(xsim)
 #########################
 UNITTEST_CONFIG ?= AllUnitTests
 
-ifdef FIRESIM_STANDALONE
-	firesimLib_sbt_project := firesim
-else
-	firesimLib_sbt_project := {file:${firesim_base_dir}/}firesimLib
-endif
-
 rocketchip_dir := $(chipyard_dir)/generators/rocket-chip
 unittest_generated_dir := $(base_dir)/generated-src/unittests/$(UNITTEST_CONFIG)
 unittest_args = \
@@ -245,7 +240,26 @@ run-midas-unittests: $(chisel_srcs)
 run-midas-unittests-debug: $(chisel_srcs)
 	$(MAKE) -f $(simif_dir)/unittest/Makefrag $@ $(unittest_args)
 
+#########################
+# ScalaDoc              #
+#########################
+docs_dir := $(firesim_base_dir)/../docs
+short_scala_version := $(basename $(SCALA_VERSION))
+docs_projects = midas firesim-lib
 
+installed_doc_dirs = $(addprefix $(docs_dir)/_static/, $(docs_projects))
+
+$(firesim_base_dir)/%/target/scala-$(short_scala_version)/api: $(FIRRTL_JAR)
+	$(SBT) "project ${midas_sbt_project}" "; doc; project firesimLib; doc; project targetutils; doc"
+
+$(docs_dir)/_static/% : $(firesim_base_dir)/%/target/scala-$(short_scala_version)/api
+	cp -rf $< $@
+
+publish-scala-doc: $(installed_doc_dirs)
+
+#########################
+# Clean                 #
+#########################
 cleanfpga:
 	rm -rf $(fpga_work_dir)
 
@@ -269,5 +283,6 @@ tags: $(HEADER) $(DRIVER_CC) $(DRIVER_H) $(midas_cc) $(midas_h)
 .PHONY: xsim-dut xsim run-xsim
 .PHONY: $(PLATFORM)-driver fpga
 .PHONY: mostlyclean clean
+.PHONY: publish-scala-doc
 
 .PRECIOUS: $(OUTPUT_DIR)/%.vpd $(OUTPUT_DIR)/%.out $(OUTPUT_DIR)/%.run
