@@ -178,5 +178,10 @@ def copy_legacy_redirects(app, docname): # Sphinx expects two arguments
             if os.path.isfile(src_path):
                 shutil.copyfile(src_path, target_path)
 
+# Generate Scala Doc
+subprocess.call(["./build-scala-doc.sh"])
+
 def setup(app):
     app.connect('build-finished', copy_legacy_redirects)
+
+
