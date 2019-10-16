@@ -8,6 +8,7 @@
 
 import shutil
 import os
+import subprocess
 
 # -- Path setup --------------------------------------------------------------
 
@@ -179,7 +180,7 @@ def copy_legacy_redirects(app, docname): # Sphinx expects two arguments
                 shutil.copyfile(src_path, target_path)
 
 # Generate Scala Doc
-subprocess.call(["./build-scala-doc.sh"])
+subprocess.run(["make", "install-scala-doc"])
 
 def setup(app):
     app.connect('build-finished', copy_legacy_redirects)
