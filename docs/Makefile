@@ -32,6 +32,6 @@ install-scala-doc:
 	cd $(FIRESIMDIR)/target-design/chipyard
 	git -C $(FIRESIMDIR)/target-design/chipyard submodule update --init --recursive generators
 	git -C $(FIRESIMDIR)/target-design/chipyard submodule update --init --recursive tools
-	$(MAKE) -C $(FIRESIMDIR)/sim publish-scala-doc FIRESIM_ENV_SOURCED=1 FIRESIM_STANDALONE=1 JVM_MEMORY=400M
+	$(MAKE) -C $(FIRESIMDIR)/sim publish-scala-doc FIRESIM_ENV_SOURCED=1 FIRESIM_STANDALONE=1 JAVA_ARGS=
 
 
