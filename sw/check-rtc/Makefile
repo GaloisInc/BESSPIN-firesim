@@ -12,6 +12,18 @@ check-rtc-linux: check-rtc-linux.c
 check-rtc: check-rtc.o crt.o syscalls.o
 	$(CC) -T link.ld $(LDFLAGS) $^ -o $@
 
+mm: mm.o crt.o syscalls.o
+	$(CC) -T link.ld $(LDFLAGS) $^ -o $@
+
+vvadd: vvadd.o crt.o syscalls.o
+	$(CC) -T link.ld $(LDFLAGS) $^ -o $@
+
+rand: rand.o crt.o syscalls.o
+	$(CC) -T link.ld $(LDFLAGS) $^ -o $@
+
+print: print.o crt.o syscalls.o
+	$(CC) -T link.ld $(LDFLAGS) $^ -o $@
+
 %.o: %.c util.h encoding.h
 	$(CC) $(CFLAGS) -c $< -o $@
 

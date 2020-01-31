@@ -503,9 +503,7 @@ bool firesim_top_t::simulation_complete() {
 }
 
 uint64_t firesim_top_t::profile_models(){
-    for (auto mod: fpga_models) {
-        mod->profile();
-    }
+    hcycle();
     return profile_interval;
 }
 

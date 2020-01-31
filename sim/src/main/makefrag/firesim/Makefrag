@@ -2,18 +2,19 @@
 
 # These point at the main class of the target's Chisel generator
 DESIGN_PACKAGE ?= firesim.firesim
-DESIGN ?= FireSim
+DESIGN ?= FireSimNoNIC
 # DESIGN ?= FireBoom
 
 # These guide chisel elaboration of the target design specified above.
 # See src/main/scala/SimConfigs.scala
 TARGET_CONFIG_PACKAGE ?= firesim.firesim
-TARGET_CONFIG ?= FireSimRocketChipConfig
-# TARGET_CONFIG ?= FireSimBoomConfig
+#TARGET_CONFIG ?= FireSimRocketChipConfig
+TARGET_CONFIG ?= FireSimBoomConfig
 
 # These guide chisel elaboration of simulation components by MIDAS, including models and widgets.
 # See src/main/scala/SimConfigs.scala
 PLATFORM_CONFIG_PACKAGE ?= firesim.firesim
+#PLATFORM_CONFIG ?= WithPrintfSynthesis_BaseF1Config
 PLATFORM_CONFIG ?= BaseF1Config
 
 name_tuple    := $(DESIGN)-$(TARGET_CONFIG)-$(PLATFORM_CONFIG)
@@ -67,7 +68,7 @@ TARGET_LD_FLAGS :=
 ################################################################
 # SW RTL Simulation Args -- for MIDAS- & FPGA-level Simulation #
 ################################################################
-TIMEOUT_CYCLES = 100000000
+TIMEOUT_CYCLES = 200000000
 
 NET_SLOT ?= 0
 NET_LINK_LATENCY ?= 6405
@@ -78,16 +79,19 @@ NET_MACADDR ?= $(shell printf '00:00:00:00:00:%02x' $$(($(NET_SLOT)+2)))
 nic_args = +shmemportname0=$(NET_SHMEMPORTNAME) +macaddr0=$(NET_MACADDR) \
 	+niclog0=niclog$(NET_SLOT) +linklatency0=$(NET_LINK_LATENCY) \
 	+netbw0=$(NET_BW) +netburst0=8 $(NET_LOOPBACK)
-tracer_args = +tracefile0=TRACEFILE
+#tracer_args = +fesvr-step-size=2004765 +tracefile0=TRACEFILE
+tracer_args = +fesvr-step-size=128 +tracefile0=TRACEFILE
 blkdev_args = +blkdev-in-mem0=128 +blkdev-log0=blkdev-log$(NET_SLOT)
 autocounter_args = +autocounter-readrate0=1000 +autocounter-filename0=AUTOCOUNTERFILE
+printf_args = +print-file=print-log
 
-SIM_RUNTIME_CONF ?= $(GENERATED_DIR)/$(CONF_NAME)
+SIM_RUNTIME_CONF ?= /home/centos/firesim-check-determinism/sim/custom-runtime-configs/single-cycle-lbp.conf
 mem_model_args = $(shell cat $(SIM_RUNTIME_CONF))
-COMMON_SIM_ARGS ?= $(mem_model_args) $(nic_args) $(tracer_args) $(blkdev_args) $(autocounter_args)
+COMMON_SIM_ARGS ?= $(mem_model_args) $(printf_args) $(nic_args) $(tracer_args) $(blkdev_args) $(autocounter_args)
 
 # Arguments used only at a particular simulation abstraction
-MIDAS_LEVEL_SIM_ARGS ?= +dramsim +max-cycles=$(TIMEOUT_CYCLES)
+#MIDAS_LEVEL_SIM_ARGS ?= +dramsim +max-cycles=$(TIMEOUT_CYCLES)
+MIDAS_LEVEL_SIM_ARGS ?= +max-cycles=$(TIMEOUT_CYCLES)
 FPGA_LEVEL_SIM_ARGS ?=
 
 ################################
@@ -105,8 +109,7 @@ sim_binary_basename := $(basename $(notdir $(SIM_BINARY)))
 
 run-verilator: $(verilator)
 	cd $(dir $<) && \
-	$(verilator) +permissive $(verilator_args) $(COMMON_SIM_ARGS) $(MIDAS_LEVEL_SIM_ARGS) $(EXTRA_SIM_ARGS) +permissive-off $(abspath $(SIM_BINARY)) \
-	$(disasm) $(sim_binary_basename).out
+	$(verilator) +permissive $(verilator_args) $(COMMON_SIM_ARGS) $(MIDAS_LEVEL_SIM_ARGS) $(EXTRA_SIM_ARGS) +permissive-off $(abspath $(SIM_BINARY))
 
 run-verilator-debug: $(verilator_debug)
 	cd $(dir $<) && \

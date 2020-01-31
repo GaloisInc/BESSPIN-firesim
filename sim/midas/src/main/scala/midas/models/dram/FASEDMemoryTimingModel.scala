@@ -280,7 +280,6 @@ class FASEDMemoryTimingModel(completeConfig: CompleteConfig, hostParams: Paramet
   // 5: If targetReset is asserted the host-memory system must first settle
   val tResetReady = (!tReset || host_mem_idle)
 
-  // decoupled helper fire currently doesn't support directly passing true/false.B as exclude
   val tFireHelper = DecoupledHelper(hPort.toHost.hValid,
                                     hPort.fromHost.hReady,
                                     ingressReady, bReady, rReady, tResetReady)
