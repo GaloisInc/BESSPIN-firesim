@@ -71,13 +71,13 @@ void firesim_fesvr_t::read_chunk(reg_t taddr, size_t nbytes, void* dst)
     size_t len = nbytes / sizeof(uint32_t);
 
     // If we are in htif::load_program route all reads through the loadmem unit
-    if (is_loadmem) {
-        load_mem_read(taddr, nbytes);
-    } else {
+    //if (is_loadmem) {
+    //    load_mem_read(taddr, nbytes);
+    //} else {
         write(&cmd, 1);
         push_addr(taddr);
         push_len(len - 1);
-    }
+    //}
     read(result, len);
 }
 
@@ -88,15 +88,15 @@ void firesim_fesvr_t::write_chunk(reg_t taddr, size_t nbytes, const void* src)
     size_t len = nbytes / sizeof(uint32_t);
 
     // If we are in htif::load_program route all writes through the loadmem unit
-    if (is_loadmem) {
-        load_mem_write(taddr, nbytes, src);
-    } else {
+    //if (is_loadmem) {
+    //    load_mem_write(taddr, nbytes, src);
+    //} else {
         write(&cmd, 1);
         push_addr(taddr);
         push_len(len - 1);
 
         write(src_data, len);
-    }
+    //}
 }
 
 void firesim_fesvr_t::read(uint32_t* data, size_t len) {

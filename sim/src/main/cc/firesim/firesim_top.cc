@@ -196,7 +196,8 @@ uint64_t host_mem_offset = -0x80000000LL;
 #ifdef SERIALBRIDGEMODULE_struct_guard
     #ifdef SERIALBRIDGEMODULE_0_PRESENT
     SERIALBRIDGEMODULE_0_substruct_create;
-    add_bridge_driver(new serial_t(this, args, SERIALBRIDGEMODULE_0_substruct, 0, host_mem_offsets[0]));
+    //add_bridge_driver(new serial_t(this, args, SERIALBRIDGEMODULE_0_substruct, 0, host_mem_offsets[0]));
+    add_bridge_driver(new serial_t(this, args, SERIALBRIDGEMODULE_0_substruct, 0, 0));
     #endif
     #ifdef SERIALBRIDGEMODULE_1_PRESENT
     SERIALBRIDGEMODULE_1_substruct_create;
