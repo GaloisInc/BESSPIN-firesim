@@ -75,7 +75,8 @@ simperf-test:
 
 linux-poweroff:
 	mkdir -p $@/overlay
-	(cd $@ && riscv64-unknown-linux-gnu-gcc -Wall -o overlay/print-mcycle print-mcycle.c)
+	cd ../../sw/check-rtc && make print-mcycle-linux
+	cp ../../sw/check-rtc/print-mcycle-linux $@/overlay/
 	python gen-benchmark-rootfs.py -w $@.json -r -b $(BASE_IMAGE) -s $@/overlay
 
 simperf-test-scale: simperf-test
