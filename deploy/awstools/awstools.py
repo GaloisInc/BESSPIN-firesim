@@ -7,11 +7,17 @@ import boto3
 import botocore
 from botocore import exceptions
 from fabric.api import local, hide
+import os
 
 rootLogger = logging.getLogger()
 
 # this needs to be updated whenever the FPGA Dev AMI changes
 f1_ami_name = "FPGA Developer AMI - 1.6.0-40257ab5-6688-4c95-97d1-e251a40fd1fc-ami-0b1edf08d56c2da5c.4"
+
+firesim_prefix = os.getenv('FIRESIM_PREFIX')
+if firesim_prefix is None:
+    print("ERROR: Set the FIRESIM_PREFIX environmental variable")
+    exit(-1)
 
 def aws_resource_names():
     """ Get names for various aws resources the manager relies on. For example:
@@ -34,10 +40,10 @@ def aws_resource_names():
     base_dict = {
         'tutorial_mode'  :   False,
         # regular users are instructed to create these in the setup instructions
-        'vpcname':           'firesim',
-        'securitygroupname': 'firesim',
+        'vpcname':           os.environ['FIRESIM_PREFIX'] + '-firesim',
+        'securitygroupname': os.environ['FIRESIM_PREFIX'] + '-firesim',
         # regular users are instructed to create a key named `firesim` in the wiki
-        'keyname':           'firesim',
+        'keyname':           os.environ['FIRESIM_PREFIX'] + '-firesim',
         's3bucketname' :     None,
         'snsname'      :     'FireSim',
         'runfarmprefix':     None,

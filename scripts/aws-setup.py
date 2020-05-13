@@ -1,9 +1,15 @@
 """ This script configures your AWS account to run FireSim. """
 
 import boto3
+import os
 
-vpcname = 'firesim'
-secgroupname = 'firesim'
+firesim_prefix = os.getenv('FIRESIM_PREFIX')
+if firesim_prefix is None:
+    print("ERROR: Set the FIRESIM_PREFIX environmental variable")
+    exit(-1)
+
+vpcname = firesim_prefix + '-firesim'
+secgroupname = firesim_prefix + '-firesim'
 
 ec2 = boto3.resource('ec2')
 client = boto3.client('ec2')

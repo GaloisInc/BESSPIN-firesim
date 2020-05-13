@@ -15,6 +15,12 @@ unamestr=$(uname)
 RISCV=$(pwd)/riscv-tools-install
 RDIR=$(pwd)
 
+if [ -z "$FIRESIM_PREFIX" ]
+then
+    echo "ERROR: Set FIRESIM_PREFIX and re-run"
+    exit -1
+fi
+
 FASTINSTALL=false
 IS_LIBRARY=false
 SUBMODULES_ONLY=false
@@ -150,6 +156,8 @@ echo "fi" >> env.sh
 if  [ "$IS_LIBRARY" = false ]; then
     echo "export FIRESIM_STANDALONE=1" >> env.sh
 fi
+
+echo "export FIRESIM_PREFIX=$FIRESIM_PREFIX" >> env.sh
 
 cd $RDIR
 
