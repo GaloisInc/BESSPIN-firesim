@@ -4,6 +4,11 @@
 
 1. [What is FireSim?](#what-is-firesim)
 2. [Getting Started](#getting-started)
+    1. [One-Time Setup](#one-time-setup)
+    2. [Setup Manager](#setup-manager)
+3. [Run Linux on Existing AFI](#run-linux-on-existing-afi)
+4. [Build Your Own Image](#build-your-own-image)
+5. [Notes and Future Additions](#notes-and-future-additions)
 
 ## What is FireSim?
 
