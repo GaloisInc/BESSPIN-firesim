@@ -147,15 +147,15 @@ sudo activate-global-python-argcomplete
 echo "PS1='\u@\H:\w\\$ '" >> /home/centos/.bashrc
 echo "machine launch script completed" >> /home/centos/machine-launchstatus
 ```
-* Step 4: Add Storage -> Remove the EBS value. Increase the size of your default root volume to some reasonable amount. 100GB is a good starting point. This instance will be downloading many repos and building full linux images.
+* Step 4: Add Storage -> Remove the EBS volume. Increase the size of your default root volume to some reasonable amount. 100GB is a good starting point. This instance will be downloading many repos and building full linux images.
 * Step 5: Add Tags -> Add them if you'd like
-* Step 6: Securit Group -> Be sure to select the `FIRESIM_PREFIX-firesim` security group after clicking `Select an existing security group`.
+* Step 6: Security Group -> Be sure to select the `FIRESIM_PREFIX-firesim` security group after clicking `Select an existing security group`.
 * Review and Launch
 
 Once the instance is running, login using SSH and your key.
 
 ```
-ssh -i keypair.pem centos@<PUBLIC IP ADDR>
+ssh -i ${YOUR_FIRESIM_PREFIX}-firesim.pem centos@<PUBLIC IP ADDR>
 ```
 
 The initial connection will take some time as the instance is running our setup script at startup.
@@ -165,9 +165,9 @@ tail -f ~/machine-launchstatus
 ```
 and wait for the `machine launch script completed!` message before continuing. Ctrl-C to exit the tail command once it is finished.
 
-Copy your private key to the instance at `~/firesim.pem`. This is required so FireSim can communicate with other instances it spins up.
+Copy your private key to the instance at `~/${YOUR_FIRESIM_PREFIX}-firesim.pem`. This is required so FireSim can communicate with other instances it spins up.
 ```
-scp -i keypair.pem keypair.pem centos@<PUBLIC IP ADDR>:firesim.pem
+scp -i ${YOUR_FIRESIM_PREFIX}-firesim.pem ${YOUR_FIRESIM_PREFIX}-firesim.pem centos@<PUBLIC IP ADDR>:
 ```
 
 Clone the FireSim repo and start the setup process. Be sure to set your `FIRESIM_PREFIX` and that it matches the one used earlier.
