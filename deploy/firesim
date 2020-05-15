@@ -148,6 +148,17 @@ def buildafi(globalbuildconf):
     # run builds, then terminate instances
     execute(aws_build, globalbuildconf, hosts=globalbuildconf.get_build_instance_ips())
 
+def buildlocalafi(globalbuildconf):
+    """ Starting from local Chisel, build an AFI for all of the specified
+    hardware configs. """
+
+    auto_create_bucket(globalbuildconf.s3_bucketname)
+
+    for buildconf in globalbuildconf.get_builds_list():
+        execute(replace_rtl, globalbuildconf, buildconf, hosts=['localhost'])
+
+    # run builds, then terminate instances
+    execute(local_build, globalbuildconf, hosts=['localhost'])
 
 def runcheck(runtime_conf):
     """ Do nothing, just let the config process run. """
@@ -202,6 +213,7 @@ def construct_firesim_argparser():
                         help='Management task to run.', choices=[
                             'managerinit',
                             'buildafi',
+                            'buildlocalafi',
                             'launchrunfarm',
                             'infrasetup',
                             'boot',
@@ -264,7 +276,7 @@ def main(args):
     if args.task == 'managerinit':
         managerinit()
 
-    if args.task == 'buildafi' or args.task == 'shareagfi':
+    if args.task == 'buildafi' or args.task == 'shareagfi' or args.task == 'buildlocalafi':
         buildconfig = GlobalBuildConfig(args)
         globals()[args.task](buildconfig)
 

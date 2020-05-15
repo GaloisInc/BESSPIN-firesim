@@ -14,7 +14,7 @@ source ./env.sh
 export PATH=$PATH:$(pwd)/deploy
 
 # setup ssh-agent
-source deploy/ssh-setup.sh
+#source deploy/ssh-setup.sh
 
 # flag for scripts to check that this has been sourced
 export FIRESIM_SOURCED=1

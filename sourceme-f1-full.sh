@@ -11,7 +11,10 @@ source ./env.sh
 # setup AWS tools
 cd $AWSFPGA
 source ./hdk_setup.sh
-source ./sdk_setup.sh
+if [ "$FIRESIM_LOCAL" != "1" ]
+then
+	source ./sdk_setup.sh
+fi
 export CL_DIR=$AWSFPGA/hdk/cl/developer_designs/cl_firesim
 cd $RDIR
 
@@ -19,7 +22,7 @@ cd $RDIR
 export PATH=$PATH:$(pwd)/deploy
 
 # setup ssh-agent
-source deploy/ssh-setup.sh
+# source deploy/ssh-setup.sh
 
 # flag for scripts to check that this has been sourced
 export FIRESIM_SOURCED=1

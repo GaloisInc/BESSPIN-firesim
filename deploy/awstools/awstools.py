@@ -49,6 +49,10 @@ def aws_resource_names():
         'runfarmprefix':     None,
     }
 
+    # if running locally, don't bother with the rest
+    if os.environ['FIRESIM_LOCAL'] is "1":
+        return base_dict
+
     # first get this instance's ID
     res = None
     with hide('everything'):
@@ -115,6 +119,8 @@ def get_aws_userid():
     But it seems that by default many accounts do not have permission to run this,
     so instead we get it from instance metadata.
     """
+    if os.environ['FIRESIM_LOCAL'] is "1":
+        return "localuser"
     res = local("""curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep -oP '(?<="accountId" : ")[^"]*(?=")'""", capture=True)
     return res.stdout.lower()
 
