@@ -231,8 +231,8 @@ def local_build(global_build_config):
     # rsync in the reverse direction to get build results
     local('cp -R {}/../platforms/f1/aws-fpga/{}/* {}/results-build/{}/'.format(ddir, fpgabuilddir, ddir, builddir))
 
-    ## next, do tar -> AGFI
-    ## This is done on the local copy
+    # next, do tar -> AGFI
+    # This is done on the local copy
     afi = None
     agfi = None
     s3bucket = global_build_config.s3_bucketname
@@ -265,7 +265,7 @@ def local_build(global_build_config):
     # append the build node IP + a random string to diff them in s3
     global_append = "-localbuild-" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10)) + ".tar"
 
-    with lcd("""{}/results-build/{}/cl_firesim/build/checkpoints/to_aws/""".format(ddir, builddir)), StreamLogger('stdout'), StreamLogger('stderr'):
+    with prefix("""cd {}/results-build/{}/build/checkpoints/to_aws/""".format(ddir, builddir)), StreamLogger('stdout'), StreamLogger('stderr'):
         files = local('ls *.tar', capture=True)
         rootLogger.debug(files)
         rootLogger.debug(files.stderr)
@@ -324,6 +324,4 @@ def local_build(global_build_config):
             rootLogger.debug("[localhost] " + str(localcap.stderr))
 
     rootLogger.info("Build complete! AFI ready. See AGFI_INFO.")
-    rootLogger.info("Terminating the build instance now.")
-    buildconfig.terminate_build_instance()
 
