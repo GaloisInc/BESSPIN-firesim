@@ -10,9 +10,12 @@ source ./env.sh
 
 # setup AWS tools
 cd $AWSFPGA
-source ./hdk_setup.sh
-if [ "$FIRESIM_LOCAL" != "1" ]
+if [ "$FIRESIM_LOCAL" == "1" ]
 then
+	echo "Executing HDK setup inside docker"
+	sudo docker run -v $RDIR:/firesim artifactory.galois.com:5008/firesim:bitstream_gen bash -c 'cd /firesim/platforms/f1/aws-fpga; source ./hdk_setup.sh'
+else
+	source ./hdk_setup.sh
 	source ./sdk_setup.sh
 fi
 export CL_DIR=$AWSFPGA/hdk/cl/developer_designs/cl_firesim

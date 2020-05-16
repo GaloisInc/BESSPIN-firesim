@@ -223,11 +223,10 @@ def local_build(global_build_config):
 
     # run the Vivado build
     with prefix('cd ' + ddir + '/../platforms/f1/aws-fpga'), \
-         prefix('source hdk_setup.sh'), \
          InfoStreamLogger('stdout'), InfoStreamLogger('stderr'):
-        local('docker run --mac-address="00:4E:01:B6:DD:79" -v ' + ddir +
-        '/../:/firesim artifactory.galois.com:5008/gfe:bitstream_gen /bin/bash -c "cd /firesim/platforms/f1/aws-fpga; source hdk_setup.sh; export CL_DIR=/firesim/platforms/f1/aws-fpga/' + fpgabuilddir +
-        '; cd \$CL_DIR/build/scripts/; ./aws_build_dcp_from_cl.sh -foreground"', shell=get_local_shell())
+        local('sudo docker run --mac-address="00:4E:01:B6:DD:79" -v ' + ddir +
+        '/../:/firesim artifactory.galois.com:5008/firesim:bitstream_gen /bin/bash -c "cd /firesim/platforms/f1/aws-fpga; source hdk_setup.sh; export CL_DIR=/firesim/platforms/f1/aws-fpga/' + fpgabuilddir +
+        '; cd \$CL_DIR/build/scripts/; ./aws_build_dcp_from_cl.sh -foreground -ignore_memory_requirement"', shell=get_local_shell())
 
     # rsync in the reverse direction to get build results
     local('cp -R {}/../platforms/f1/aws-fpga/{}/* {}/results-build/{}/'.format(ddir, fpgabuilddir, ddir, builddir))

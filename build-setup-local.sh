@@ -104,7 +104,7 @@ fi
 target_chipyard_dir=$RDIR/target-design/chipyard
 
 # setup marshal symlink
-ln -s ../target-design/chipyard/software/firemarshal $RDIR/sw/firesim-software
+ln -sf ../target-design/chipyard/software/firemarshal $RDIR/sw/firesim-software
 
 # Build toolchain here if needed
 
@@ -130,6 +130,7 @@ cd $RDIR
 marshal_dir=$RDIR/sw/firesim-software
 cd $RDIR
 sudo pip3 install -r $marshal_dir/python-requirements.txt
+sudo pip2 install -r python2-requirements.txt
 #cat $marshal_dir/centos-requirements.txt | sudo xargs yum install -y
 #wget https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git/snapshot/e2fsprogs-1.45.4.tar.gz
 #tar xvzf e2fsprogs-1.45.4.tar.gz
