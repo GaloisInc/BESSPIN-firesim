@@ -1,7 +1,7 @@
 //See LICENSE for license details
 #include "firesim_fesvr.h"
 
-#define MSIP_BASE 0x2000000
+#define MSIP_BASE 0x10000000
 
 #define NHARTS_MAX 16
 
