@@ -4,8 +4,9 @@
 
 1. [What is FireSim?](#what-is-firesim)
 2. [Getting Started](#getting-started)
-    1. [One-Time Setup](#one-time-setup)
-    2. [Setup Manager](#setup-manager)
+    1. [Quick Setup](#quick-setup)
+    2. [One-Time Setup](#one-time-setup)
+    3. [Setup Manager](#setup-manager)
 3. [Run Linux on Existing AFI](#run-linux-on-existing-afi)
 4. [Build Your Own Image](#build-your-own-image)
 5. [Notes and Future Additions](#notes-and-future-additions)
@@ -25,6 +26,10 @@ Another good overview (in video format) is our tutorial from the Chisel Communit
 
 This simple tutorial will guide you through setting up a FireSim manager instance, run a pre-built AFI (AWS FPGA Image), and build an AFI of our own.
 It will assume you already have access to the AWS DARPA portal, are generally familiar with starting/stopping/logging into instances, and generating AWS key pairs.
+
+### Quick Setup
+
+There is now a quick-setup available that uses pre-built Linux/FreeBSD images along with prebuilt AFIs. For details, [see this README](https://gist.github.com/dhand-galois/9c41af3c10cb9cea2daf2ae1c9e2deed)
 
 ### One-Time Setup
 
@@ -208,7 +213,11 @@ and start the build process:
 ```
 cd ~/firesim/sw/firesim-software
 ./init-submodules.sh
-sed -i 's/80000000/c0000000/' riscv-pk/bbl/bbl.lds
+
+cd ~/firesim
+./gfe_fixes.sh
+
+cd ~/firesim/sw/firesim-software
 ./marshal -v build br-base.json
 ```
 This will take some time on this instance with only 4 vCPUs.
@@ -338,9 +347,31 @@ instancetype=z1d.2xlarge
 deploytriplet=None
 ```
 
-This recipe has a tag of `firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3` (can be whatever you want) and passes the `TARGET_CONFIG` options to chipyard to build
-a `SSITHConfig` (Blackbox SSITH core) version of FireSim with a Bluespec P2, DDR3, and NIC. The UART and block devices are always included.
-You could modify `PLATFORM_CONFIG` to set a different emulated speed. Or change `instancetype` to use a cheaper build instance. You will likely want an instance with at least 32GB of RAM.
+Options generic to either Chisel or Bluespec cores:
+* `DESIGN=FireSim` sets the top-level scala class. It is very unlikely you'd want to change this
+* `TARGET_CONFIG` is passed to chipyard to build the actual SoC complex. Options can be combined.
+  * `WithNIC` adds the IceNIC at `0x62100000`
+  * `DDR3FRFCFSLLC4M` adds the standard DDR controller and L2 cache
+  * There are two underlying build configurations available, as explained below. `FireSimSSITHConfig` and `FireSimCloudGFEConfig`
+* `PATFORM_CONFIG` is used by FireSim to implement platform level options, such as the synthesis target frequency and underlying hardware (only F1 supported). Use `FXXMHz` to select the SoC's frequency. Good options are `F50MHz`, `F75MHz`, and `F90MHz`. Others may work as well.
+* `instancetype` sets the EC2 instance used to build the image. The default of `z1d.2xlarge` is a good balance between cost and speed. You'll need an instance with minimum 32GB of RAM.
+* `deploytriplet` is currently unused
+
+UART and block devices are always included.
+
+### Build with a "BlackBox" SSITH Core - `FireSimSSITHConfig`
+
+This flow currently works for BSV-based processors. Follow the instructions in the SSITH chipyard README to customize the core (to come).
+
+Adding the `WithBluespecP2` modifier specifies to use the BSV P2 repo as the blackbox core (default).
+
+### Build with a CloudGFE P2 Core (Chisel based) - `FireSimCloudGFEConfig`
+
+This flow builds chisel-based processors directly. Follow the instructions in the SSITH chipyard README for more information on customizing the core (to come).
+
+Then use the `FireSimCloudGFEConfig` configuration in your `TARGET_CONFIG`, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEConfig`.
+
+### Continuing the build
 
 Now define your build tag in `~/firesim/deploy/config_build.ini`:
 ```
@@ -403,5 +434,4 @@ This will dump the UART output to the console. You can Ctrl-C to stop the simula
 
 * Networking does not work out of the box. Need to make some modifications to the switch software and run iptables setup on the F1 instance manually. Will document
 so we can decide if this should be automated in FireSim or just used in our own solution
-
 
