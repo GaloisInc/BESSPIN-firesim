@@ -339,9 +339,9 @@ A few build recipes have been preset for you. Feel free to change these as neede
 First, define your build recipe in `~/firesim/deploy/config_build_recipes.ini`:
 ```
 ...
-[firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3]
+[firesim-bluespec_p2-dropincore-nic-l2-llc4mb-ddr3]
 DESIGN=FireSim
-TARGET_CONFIG=WithNIC_DDR3FRFCFSLLC4MB_WithBluespecP2_FireSimSSITHConfig
+TARGET_CONFIG=WithNIC_DDR3FRFCFSLLC4MB_WithBluespecP2_FireSimSSITHDropInConfig
 PLATFORM_CONFIG=F50MHz_BaseF1Config
 instancetype=z1d.2xlarge
 deploytriplet=None
@@ -352,24 +352,30 @@ Options generic to either Chisel or Bluespec cores:
 * `TARGET_CONFIG` is passed to chipyard to build the actual SoC complex. Options can be combined.
   * `WithNIC` adds the IceNIC at `0x62100000`
   * `DDR3FRFCFSLLC4M` adds the standard DDR controller and L2 cache
-  * There are two underlying build configurations available, as explained below. `FireSimSSITHConfig` and `FireSimCloudGFEConfig`
+  * There are two main build strategies available, as explained below. `FireSimSSITHDropInConfig` and `FireSimCloudGFEChiselPXConfig`
 * `PATFORM_CONFIG` is used by FireSim to implement platform level options, such as the synthesis target frequency and underlying hardware (only F1 supported). Use `FXXMHz` to select the SoC's frequency. Good options are `F50MHz`, `F75MHz`, and `F90MHz`. Others may work as well.
 * `instancetype` sets the EC2 instance used to build the image. The default of `z1d.2xlarge` is a good balance between cost and speed. You'll need an instance with minimum 32GB of RAM.
 * `deploytriplet` is currently unused
 
 UART and block devices are always included.
 
-### Build with a "BlackBox" SSITH Core - `FireSimSSITHConfig`
+### Build with a "DropIn" SSITH Core - `FireSimSSITHDropInConfig`
 
-This flow currently works for BSV-based processors. Follow the instructions in the SSITH chipyard README to customize the core (to come).
+This flow enables "dropping in" any processor core that conforms to the expected GFE subsystem. It currently works for BSV-based processors, but would also work for
+chisel processors compiled to verilog with some modifications. Information on adding new drop-in cores can be found in the chipyard repo README (to come).
 
-Adding the `WithBluespecP2` modifier specifies to use the BSV P2 repo as the blackbox core (default).
+For FireSim, you can select the drop-in replacement using an optional modifier in the `TARGET_CONFIG` recipe.
 
-### Build with a CloudGFE P2 Core (Chisel based) - `FireSimCloudGFEConfig`
+Available drop-ins:
+* `WithBluespecP2` - specifies to use the BSV P2 (Flute) repo as the blackbox core (default).
 
-This flow builds chisel-based processors directly. Follow the instructions in the SSITH chipyard README for more information on customizing the core (to come).
+### Build with a CloudGFE P1 Core (Chisel based) - `FireSimCloudGFEChiselP1Config`
 
-Then use the `FireSimCloudGFEConfig` configuration in your `TARGET_CONFIG`, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEConfig`.
+This flow compiles a P1 (32-bit) processor directly from Chisel source. Append this configuration option to the end of the `TARGET_CONFIG` string, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEChiselP1Config`.
+
+### Build with a CloudGFE P2 Core (Chisel based) - `FireSimCloudGFEChiselP2Config`
+
+This flow compiles a P2 (64-bit) processor directly from Chisel source. Append this configuration option to the end of the `TARGET_CONFIG` string, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEChiselP2Config`.
 
 ### Continuing the build
 
@@ -378,8 +384,9 @@ Now define your build tag in `~/firesim/deploy/config_build.ini`:
 [builds]
 # this section references builds defined in config_build_recipes.ini
 # if you add a build here, it will be built when you run buildafi
-#firesim-bluespec_p2-ssithcore-no-nic-l2-llc4mb-ddr3
-firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3
+#firesim-cloudgfe-chisel-p2-nic-l2-llc4mb-ddr3
+#firesim-cloudgfe-chisel-p1-nic-l2-llc4mb-ddr3
+firesim-bluespec_p2-dropincore-nic-l2-llc4mb-ddr3
 ```
 
 You can specify multiple builds, but your AWS account may not have sufficient vCPU limits to support concurrent builds. You can also add your build tag to the `agfitoshare` section, which will
@@ -402,7 +409,7 @@ It will also be printed in the terminal window and saved to a file in `~/firesim
 
 Finally add the new image to `~/firesim/deploy/config_hwdb.ini`. Example:
 ```
-[firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3e
+[firesim-bluespec_p2-dropincore-nic-l2-llc4mb-ddr3e
 agfi=agfi-0e9a472782e8e53c2
 deploytripletoverride=None
 customruntimeconfig=None
@@ -413,9 +420,8 @@ And update `~/firesim/deploy/config_runtime.ini` to point to the new tag:
 # This references a section from config_hwconfigs.ini
 # In homogeneous configurations, use this to set the hardware config deployed
 # for all simulators
-#defaulthwconfig=firesim-rocket-quadcore-nic-l2-llc4mb-ddr3
-#defaulthwconfig=firesim-rocket-singlecore-no-nic-l2-llc4mb-ddr3
-defaulthwconfig=firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3
+# defaulthwconfig=firesim-cloudgfe-chisel-p2-nic-l2-llc4mb-ddr3
+defaulthwconfig=firesim-bluespec_p2-dropincore-nic-l2-llc4mb-ddr3
 ```
 
 Note: You can build new AFIs under existing tags and just update the `agfi=<AGFI Number>` option in `config_hwdb.ini` when it is finished building.
