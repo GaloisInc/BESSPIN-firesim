@@ -24,14 +24,17 @@ fi
 FASTINSTALL=false
 IS_LIBRARY=false
 SUBMODULES_ONLY=false
+SKIP_TOOLCHAIN=false
 
 function usage
 {
-    echo "usage: build-setup.sh [ fast | --fast] [--submodules-only] [--library]"
+    echo "usage: build-setup.sh [ fast | --fast] [--submodules-only] [--library] [--skip-toolchain]"
     echo "   fast: if set, pulls in a pre-compiled RISC-V toolchain for an EC2 manager instance"
     echo "   submodules-only: if set, skips toolchain handling (cloning or building)"
     echo "   library: if set, initializes submodules assuming FireSim is being used"
     echo "            as a library submodule"
+    echo "   skip-toolchain: can be combined with library option to skip building a toolchain"
+    echo "            for chipyard installs"
 }
 
 if [ "$1" == "--help" -o "$1" == "-h" -o "$1" == "-H" ]; then
@@ -51,6 +54,9 @@ do
         --submodules-only)
             SUBMODULES_ONLY=true;
             ;;
+	--skip-toolchain)
+	    SKIP_TOOLCHAIN=true;
+	    ;;
         -h | -H | --help)
             usage
             exit
@@ -125,6 +131,7 @@ fi
 # The devtoolset wrapper around sudo does not correctly pass options
 # through, which causes an aws-fpga SDK setup script to fail:
 # platforms/f1/aws-fpga/sdk/userspace/install_fpga_mgmt_tools.sh
+if [ "$SKIP_TOOLCHAIN" = false ]; then
 (
     # Enable latest Developer Toolset for GNU make 4.x
     devtoolset=''
@@ -144,6 +151,7 @@ fi
         ./scripts/build-toolchains.sh
     fi
 )
+fi
 
 #generate env.sh file which sources the chipyard env.sh file
 echo "if [ -f \"$target_chipyard_dir/env.sh\" ]; then" > env.sh

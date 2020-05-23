@@ -48,7 +48,7 @@ class TracerVBridgeModule(key: TracerVKey)(implicit p: Parameters) extends Bridg
   val tFire = hPort.toHost.hValid && hPort.fromHost.hReady
   //trigger conditions
   val traces = hPort.hBits.traces.flatten
-  private val pcWidth = traces.map(_.iaddr.getWidth).max
+  private val pcWidth = 40 // Fix the pcWidth at 40 to match expectation of host-side Tracer software
   private val insnWidth = traces.map(_.insn.getWidth).max
 
   //Program Counter trigger value can be configured externally
@@ -154,7 +154,8 @@ class TracerVBridgeModule(key: TracerVKey)(implicit p: Parameters) extends Bridg
   lazy val toHostCPUQueueDepth  = TOKEN_QUEUE_DEPTH
   lazy val dmaSize = BigInt((BIG_TOKEN_WIDTH / 8) * TOKEN_QUEUE_DEPTH)
 
-  val uint_traces = (traces map (trace => Cat(trace.valid, trace.iaddr).pad(64))).reverse
+  // Pad the iaddr to 40-bits to fix compatibility with host-side software
+  val uint_traces = (traces map (trace => Cat(trace.valid, trace.iaddr.pad(40)).pad(64))).reverse
   outgoingPCISdat.io.enq.bits := Cat(Cat(trace_cycle_counter,
                                          0.U((outgoingPCISdat.io.enq.bits.getWidth - Cat(uint_traces).getWidth - trace_cycle_counter.getWidth).W)),
                                      Cat(uint_traces))
