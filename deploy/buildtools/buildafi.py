@@ -13,6 +13,8 @@ from awstools.afitools import *
 from awstools.awstools import send_firesim_notification
 from util.streamlogger import StreamLogger, InfoStreamLogger
 
+import os.path
+
 rootLogger = logging.getLogger()
 
 def get_local_shell():
@@ -41,8 +43,8 @@ def replace_rtl(conf, buildconfig):
         local("""cp $CL_DIR/design/cl_firesim_generated.sv {}/results-build/{}/cl_firesim_generated.sv""".format(ddir, builddir), shell=get_local_shell())
 
     # build the fpga driver that corresponds with this version of the RTL
-    #with prefix('cd ' + ddir + '/../'), prefix('source sourceme-f1-manager.sh'), prefix('cd sim/'), StreamLogger('stdout'), StreamLogger('stderr'):
-    #    local(buildconfig.make_recipe("f1"), shell=get_local_shell())
+    with prefix('cd ' + ddir + '/../'), prefix('source sourceme-f1-manager.sh'), prefix('cd sim/'), StreamLogger('stdout'), StreamLogger('stderr'):
+        local(buildconfig.make_recipe("f1"), shell=get_local_shell())
 
 @parallel
 def aws_build(global_build_config, bypass=False):
@@ -203,6 +205,78 @@ def aws_build(global_build_config, bypass=False):
     rootLogger.info("Terminating the build instance now.")
     buildconfig.terminate_build_instance()
 
+def local_sw_pkg(conf, buildconfig):
+    """ Package F1 instance software required to run current AGFI """
+    rootLogger.info("Running process to build local SW package.")
+
+    ddir = get_deploy_dir()
+    builddir = buildconfig.name
+    triplet = buildconfig.get_chisel_triplet()
+    s3bucket = conf.s3_bucketname
+    swdir = "{}/results-build/{}/sw".format(ddir, builddir)
+    switchbuilddir = "{}/results-build/{}/switch-build".format(ddir, builddir)
+    switchswdir = "{}/../target-design/switch/".format(ddir)
+    swpkgname = "{}-sw".format(buildconfig.name)
+    hwconf = conf.hwdb.get_runtimehwconfig_from_name(buildconfig.name)
+
+    def local_logged(startdir, command):
+        """ Run local command with logging. """
+        with prefix('cd ' + startdir), StreamLogger('stdout'), StreamLogger('stderr'):
+            localcap = local(command, shell=get_local_shell(), capture=True)
+            rootLogger.debug(localcap)
+            rootLogger.debug(localcap.stderr)
+
+    # Copy the skeleton folder
+    local_logged(ddir + '/../', 'rm -rf {} && mkdir -p {}'.format(swdir, swdir))
+    local_logged(ddir + '/../', 'cp -R platforms/f1/run-skel/* {}/'.format(swdir))
+
+    # This is likely already done, but run it again just to be safe. build the fpga driver that corresponds with this version of the RTL
+    rootLogger.info("Building FireSim-f1 executable")
+    with prefix('cd ' + ddir + '/../'), prefix('source sourceme-f1-manager.sh'), prefix('cd sim/'), StreamLogger('stdout'), StreamLogger('stderr'):
+        local(buildconfig.make_recipe("f1"), shell=get_local_shell())
+    local_logged(ddir + '/../sim', 'cp output/f1/{}/FireSim-f1 {}/sim/FireSim-f1'.format(triplet, swdir))
+    local_logged(ddir + '/../sim', 'cp output/f1/{}/runtime.conf {}/sim/runtime.conf'.format(triplet, swdir))
+
+    # Build the xdma driver using our current OS
+    rootLogger.info("Building xdma driver - assuming current OS (or docker container) matches that of the F1 instance!!")
+    # This should be improved to handle this more generically, but it'll do for now...
+    if os.path.exists("/.dockerenv"):
+        local_logged(ddir + '/../', 'make -C /usr/src/kernels/3.10.0-957.5.1.el7.x86_64 M=$(pwd)/platforms/f1/aws-fpga/sdk/linux_kernel_drivers/xdma modules')
+        local_logged(ddir + '/../', 'cp platforms/f1/aws-fpga/sdk/linux_kernel_drivers/xdma/xdma.ko {}/kmods/'.format(swdir))
+    else:
+        with prefix('cd ' + ddir + '/../platforms/f1/aws-fpga/sdk/linux_kernel_drivers/xdma'), StreamLogger('stdout'), StreamLogger('stderr'):
+            local('make clean ; make')
+            local('cp xdma.ko {}/results-build/{}/sw/kmods/'.format(ddir, builddir))
+
+    # Copy our version of libdwarf and libelf
+    rootLogger.info("Copying current version of libdwarf and libelf")
+    local_logged(ddir + '/../', 'cp $RISCV/lib/libdwarf.so {}/sim/libdwarf.so.1'.format(swdir))
+    local_logged(ddir + '/../', 'cp $RISCV/lib/libelf.so {}/sim/libelf.so.1'.format(swdir))
+
+    # Build the switch software
+    # This is going to assume we are using the standard 2 port setup no matter what.. This can result in the switch being
+    # completely useless and freezing the simulator if you have a different setup
+    rootLogger.info("Building the switch software")
+    local_logged(ddir + '/../', 'rm -rf {} && cp -R {} {}'.format(switchbuilddir, switchswdir, switchbuilddir))
+    local_logged(switchbuilddir, 'cp ../sw/support/switchconfig.h .')
+    local_logged(switchbuilddir, 'make && cp switch ../sw/sim/switch0')
+
+    # Update some placeholders
+    rootLogger.info("Updating placeholders")
+    local_logged(swdir, 'sed -i s/FIRESIM_AGFI/{}/g sim/run_sim.sh'.format(hwconf.agfi))
+    local_logged(swdir, 'sed -i s/FIRESIM_CONFIG/{}/g sim/run_sim.sh'.format(hwconf.name))
+
+    # Finally, tar it up
+    rootLogger.info("Creating distributable package...")
+    local_logged(swdir + '/../', 'rm -f {}.tgz && tar czvf {}.tgz sw/*'.format(swpkgname, swpkgname))
+    rootLogger.info('Package created at {}.tgz'.format(ddir + '/results-build/' + builddir + swpkgname))
+
+    rootLogger.info("Copying to AWS S3 Bucket...")
+    s3path = 's3://{}/swpkgs/{}.tgz'.format(s3bucket, swpkgname)
+    local_logged(swdir + '/../', 'aws s3 cp {}.tgz {}'.format(swpkgname, s3path))
+    rootLogger.info('Successfully copied to {}'.format(s3path))
+
+
 @parallel
 def local_build(global_build_config):
     """ Run Vivado, convert tar -> AGFI/AFI. Runs locally
@@ -218,14 +292,16 @@ def local_build(global_build_config):
     buildconfig = builds[0]
     builddir = buildconfig.get_build_dir_name()
     # local AWS build directory; might have config-specific changes to fpga flow
+    # When using sibling docker method, need to give true host path to firesim rather than our fake path
+    firesimdir = os.getenv('FIRESIM_HOST_PATH') or ddir + '/../'
     fpgabuilddir = "hdk/cl/developer_designs/cl_" + buildconfig.get_chisel_triplet()
     remotefpgabuilddir = "hdk/cl/developer_designs/cl_firesim"
 
     # run the Vivado build
     with prefix('cd ' + ddir + '/../platforms/f1/aws-fpga'), \
          InfoStreamLogger('stdout'), InfoStreamLogger('stderr'):
-        local('sudo docker run --mac-address="00:4E:01:B6:DD:79" -v ' + ddir +
-        '/../:/firesim artifactory.galois.com:5008/firesim:bitstream_gen /bin/bash -c "cd /firesim/platforms/f1/aws-fpga; source hdk_setup.sh; export CL_DIR=/firesim/platforms/f1/aws-fpga/' + fpgabuilddir +
+        local('sudo docker run --mac-address="00:4E:01:B6:DD:79" -v ' + firesimdir +
+        ':/firesim artifactory.galois.com:5008/firesim:bitstream_gen /bin/bash -c "cd /firesim/platforms/f1/aws-fpga; source hdk_setup.sh; export CL_DIR=/firesim/platforms/f1/aws-fpga/' + fpgabuilddir +
         '; cd \$CL_DIR/build/scripts/; ./aws_build_dcp_from_cl.sh -foreground -ignore_memory_requirement"', shell=get_local_shell())
 
     # rsync in the reverse direction to get build results

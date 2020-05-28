@@ -160,6 +160,12 @@ def buildlocalafi(globalbuildconf):
     # run builds, then terminate instances
     execute(local_build, globalbuildconf, hosts=['localhost'])
 
+def buildlocalsw(globalbuildconf):
+    """ Build a distributable software package for the current build target """
+    auto_create_bucket(globalbuildconf.s3_bucketname)
+    for buildconf in globalbuildconf.get_builds_list():
+        execute(local_sw_pkg, globalbuildconf, buildconf, hosts=['localhost'])
+
 def runcheck(runtime_conf):
     """ Do nothing, just let the config process run. """
     pass
@@ -214,6 +220,7 @@ def construct_firesim_argparser():
                             'managerinit',
                             'buildafi',
                             'buildlocalafi',
+                            'buildlocalsw',
                             'launchrunfarm',
                             'infrasetup',
                             'boot',
@@ -277,6 +284,10 @@ def main(args):
         managerinit()
 
     if args.task == 'buildafi' or args.task == 'shareagfi' or args.task == 'buildlocalafi':
+        buildconfig = GlobalBuildConfig(args)
+        globals()[args.task](buildconfig)
+
+    if args.task == 'buildlocalsw':
         buildconfig = GlobalBuildConfig(args)
         globals()[args.task](buildconfig)
 
