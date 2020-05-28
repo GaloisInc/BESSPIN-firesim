@@ -29,7 +29,7 @@ It will assume you already have access to the AWS DARPA portal, are generally fa
 
 ### Quick Setup
 
-There is now a quick-setup available that uses pre-built Linux/FreeBSD images along with prebuilt AFIs. For details, [see this README](https://gist.github.com/dhand-galois/9c41af3c10cb9cea2daf2ae1c9e2deed)
+There are now quick-setup packages available that use pre-built Linux/FreeBSD images along with prebuilt AFIs. For details, [see this README](https://github.com/DARPA-SSITH-Demonstrators/BESSPIN-CloudGFE/blob/master/FireSim/minimal_cloudgfe.md)
 
 ### One-Time Setup
 
