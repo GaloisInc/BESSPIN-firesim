@@ -281,6 +281,8 @@ def main(args):
         globals()[args.task](buildconfig)
 
     if args.task == 'terminaterunfarm':
+        if "FIRESIM_LOCAL" in os.environ:
+            raise Exception("{} is not available when running the localized version of FireSim.".format(args.task))
         runtime_conf = RuntimeConfig(args)
         terminaterunfarm(runtime_conf, args.terminatesomef116,
                          args.terminatesomef14,
@@ -288,6 +290,8 @@ def main(args):
                          args.forceterminate)
 
     if args.task in ['launchrunfarm', 'infrasetup', 'boot', 'kill', 'runworkload', 'runcheck']:
+        if "FIRESIM_LOCAL" in os.environ:
+            raise Exception("{} is not available when running the localized version of FireSim.".format(args.task))
         # construct simulation config
         simconf = RuntimeConfig(args)
         # run task
