@@ -13,10 +13,14 @@ unamestr=$(uname)
 RISCV=$(pwd)/riscv-tools-install
 RDIR=$(pwd)
 
+[[ "$0" == "$BASH_SOURCE" ]] && ret=exit || ret=return
+
 if [ -f firesim-setup-complete ]
 then
   echo "Setup has already been completed. If you really want to run this script, remove ./firesim-setup-complete first."
-  [[ "$0" == "$BASH_SOURCE" ]] && exit || return
+  set +e
+  set +o pipefail
+  $ret 0
 fi
 
 git config submodule.target-design/chipyard.update none
@@ -71,10 +75,12 @@ cd $RDIR
 marshal_dir=$RDIR/sw/firesim-software
 
 cd $RDIR
-bash sourceme-f1-full.sh
+bash sourceme-f1-manager.sh
 
 # Fixup certain submodules
 bash gfe_fixes.sh
 
 touch firesim-setup-complete
+set +e
+set +o pipefail
 echo "Setup complete!"

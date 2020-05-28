@@ -8,6 +8,15 @@ function die() {
 	exit -1
 }	
 
+if [ ! -f target-design/chipyard/software/firemarshal/README.md ]
+then
+	die
+else
+	pushd target-design/chipyard/software/firemarshal
+	git submodule update --init riscv-pk
+	popd
+fi
+
 if [ -f target-design/chipyard/software/firemarshal/riscv-pk/bbl/bbl.lds ]
 then
 	echo "Patching riscv-pk/bbl/bbl.lds"
