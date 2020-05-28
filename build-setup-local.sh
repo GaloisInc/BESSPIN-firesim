@@ -16,7 +16,7 @@ RDIR=$(pwd)
 if [ -f firesim-setup-complete ]
 then
   echo "Setup has already been completed. If you really want to run this script, remove ./firesim-setup-complete first."
-  return
+  [[ "$0" == "$BASH_SOURCE" ]] && exit || return
 fi
 
 git config submodule.target-design/chipyard.update none
@@ -72,6 +72,9 @@ marshal_dir=$RDIR/sw/firesim-software
 
 cd $RDIR
 bash sourceme-f1-full.sh
+
+# Fixup certain submodules
+bash gfe_fixes.sh
 
 touch firesim-setup-complete
 echo "Setup complete!"
