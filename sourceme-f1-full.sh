@@ -24,8 +24,8 @@ cd $RDIR
 # put the manager on the user path
 export PATH=$PATH:$(pwd)/deploy
 
-# setup ssh-agent
-# source deploy/ssh-setup.sh
+# setup ssh-agent, only if not local
+[[ "$FIREISM_LOCAL" != "1" ]] && source deploy/ssh-setup.sh
 
 # flag for scripts to check that this has been sourced
 export FIRESIM_SOURCED=1

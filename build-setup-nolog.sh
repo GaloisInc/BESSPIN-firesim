@@ -20,6 +20,8 @@ echo "This script is meant to be run when using FireSim on AWS."
 echo "Try the \`cloudgfe\` branch or, if you really know what you're doing,"
 echo "comment out these lines in build-setup-nolog.sh"
 echo ""
+set +e
+set +o pipefile
 [[ "$0" == "$BASH_SOURCE" ]] && exit || return
 
 if [ -z "$FIRESIM_PREFIX" ]
