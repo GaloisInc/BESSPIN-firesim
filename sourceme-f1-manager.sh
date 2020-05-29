@@ -13,8 +13,8 @@ source ./env.sh
 # put the manager on the user path
 export PATH=$PATH:$(pwd)/deploy
 
-# setup ssh-agent
-source deploy/ssh-setup.sh
+# setup ssh-agent, only if not localized
+[[ "$FIRESIM_LOCAL" != "1" ]] && source deploy/ssh-setup.sh
 
 # flag for scripts to check that this has been sourced
 export FIRESIM_SOURCED=1

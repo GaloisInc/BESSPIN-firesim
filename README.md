@@ -1,348 +1,105 @@
-# CloudGFE FireSim
+# CloudGFE FireSim - On Prem
 
 ## Contents
 
-1. [What is FireSim?](#what-is-firesim)
+1. [What is FireSim On Prem?](#what-is-firesim-on-prem)
 2. [Getting Started](#getting-started)
     1. [Quick Setup](#quick-setup)
-    2. [One-Time Setup](#one-time-setup)
-    3. [Setup Manager](#setup-manager)
-3. [Run Linux on Existing AFI](#run-linux-on-existing-afi)
-4. [Build Your Own Image](#build-your-own-image)
-5. [Notes and Future Additions](#notes-and-future-additions)
+    2. [FireSim Docker Containers](#firesim-docker-containers)
+    3. [One-Time Setup](#one-time-setup)
+    4. [Setup Manager](#setup-manager)
+4. [Build an AFI](#build-an-afi)
+    1. [Build with a Drop-In Core](#build-with-a-dropin-ssith-core---firesimssithdropinconfig)
+    2. [Build with a Chisel P1](#build-with-a-cloudgfe-p1-core-chisel-based---firesimcloudgfechiselp1config)
+    3. [Build with a Chisel P2](#build-with-a-cloudgfe-p2-core-chisel-based---firesimcloudgfechiselp2config)
+    4. [Continuing the Build](#continuing-the-build)
+    5. [Update HWDB](#update-hwdb)
+    6. [Build Software Support Package](#build-software-support-package)
+5. [Automation Summary](#automation-summary)
 
-## What is FireSim?
+## What is FireSim On Prem?
 
 FireSim is an [open-source](https://github.com/firesim/firesim) cycle-accurate
 FPGA-accelerated full-system hardware simulation platform that runs on cloud FPGAs (Amazon EC2 F1).
 
+This is a modified version of FireSim to facilitate on premises builds of AFIs.
+FireSim On Prem has been modified primarily to build AFIs and associated software packages - some existing FireSim functions tied tightly to AWS have been disabled (ex: run farms).
+
 In CloudGFE, FireSim is capable of running both Bluespec and Chisel based SSITH cores. There are two approaches for integrating your custom core, as described later.
 
-The FireSim documentation is very good for learning the basics, but there have been some modifications to support CloudGFE.
+The FireSim documentation is very good for learning the basics.
 If you'd like to learn more about FireSim, see here: https://docs.fires.im/. 
 Another good overview (in video format) is our tutorial from the Chisel Community Conference on [YouTube](https://www.youtube.com/watch?v=S3OriQnJXYQ).
 
 ## Getting Started
 
-This simple tutorial will guide you through setting up a FireSim manager instance, run a pre-built AFI (AWS FPGA Image), and build an AFI of our own.
-It will assume you already have access to the AWS DARPA portal, are generally familiar with starting/stopping/logging into instances, and generating AWS key pairs.
+This simple tutorial will guide you through setting up an On Prem FireSim build system.
+It will assume you already have access to the AWS DARPA portal and have access to either the FireSim Docker containers or can create your own build environment.
 
 ### Quick Setup
 
-There is now a quick-setup available that uses pre-built Linux/FreeBSD images along with prebuilt AFIs. For details, [see this README](https://gist.github.com/dhand-galois/9c41af3c10cb9cea2daf2ae1c9e2deed)
+There are now quick-setup packages available that use pre-built Linux/FreeBSD images along with prebuilt AFIs. For details, [see this README](https://github.com/DARPA-SSITH-Demonstrators/BESSPIN-CloudGFE/blob/master/FireSim/minimal_cloudgfe.md)
+
+### FireSim Docker Containers
+
+Two docker containers have been created to make running FireSim on premises easier.
+
+The first, `artifactory.galois.com:5008/firesim:runtime`, contains all the necessary packages for running FireSim scripts, building netlists from Chisel, and compiling support software (host-side communication binaries, kernel modules, etc).
+
+The second, `artifactory.galois.com:5008/firesim:bitstream_gen`, contains the correct version of Vivado and the AWS F1 license to build the Vivado design files for AWS to convert into AFIs.
+
+It is possible to run this version of FireSim without either of these docker containers, but that process is not documented here. See [the docker build scripts](https://gitlab-ext.galois.com/ssith/docker-tools) for an example of the environment you'll need to create.
+
+**Note** It is assumed the environment you are running FireSim in matches that of the F1 instances you'll eventually use. For example, if you run this on Debian Buster, you'll need to set the F1 instance's AMI to match. The `runtime` docker container has been carefully matched to the `FPGA Developer 1.6.0` AMI.
 
 ### One-Time Setup
 
-There is a one-time setup step per user to generate your own firesim VPC and security group. These will be used by FireSim to group all your
-instances together and maintain access across them.
+There is a one-time setup required to initialize your FireSim system.
 
-First, pick your `FIRESIM_PREFIX`. It should be unique to you. This allows multiple users on the same AWS account to run FireSim.
-
-Create a new keypair with the name `FIRESIM_PREFIX-firesim`. For example, if my `FIRESIM_PREFIX` is `hello`, my key name would be `hello-firesim`.
-
-Next launch a new instance in the EC2 dashboard.
-* Step 1: Choose AMI -> Use the `Amazon Linux 2 AMI` with `64-bit (x86)` selected.
-* Step 2: Instance Type -> `t2.nano` is all we need for this step.
-* Step 3: Instance Details -> Set `Network` to the `aws-controltower-VPC` option. Set `Subnet` to one of the `PublicSubnet` options, 
-and ensure `Auto-assign Public IP` is set to `Enable`. All other options can stay at default values.
-* Skip Steps 4-7: At this point you can just press the `Review and Launch` button.
-
-At the final setup page, hit `Launch` and be sure to pick the key you just created (`FIRESIM_PREFIX-firesim`). Once your instance is up and running, use the public IP to login.
-
+First, set your AWS credentials using environmental variables. These can be easily copy/pasted from the [DARPA portal](https://darpa-ssith.awsapps.com/start#/):
 ```
-ssh -i $FIRESIM_PREFIX-firesim.pem ec2-user@<INSTANCE IP ADDR>
+export AWS_ACCESS_KEY_ID=...
+export AWS_SECRET_ACCESS_KEY=...
+export AWS_SESSION_TOKEN=...
+export AWS_DEFAULT_REGION='us-west-2'
 ```
+Be sure to add your default region, which is not included on the DARPA page.
 
-At the command prompt run:
+It's also strongly advised to use SSH key forwarding or `ssh-agent` to manage access to both github.com and gitlab-ext.galois.com. Repos are spread across these two sites. The docker start script will automatically pass-through an SSH agent configuration.
+
+If using docker, start the environment using the `./start_docker.sh` script. If you don't already have the docker image downloaded, it will take some time to run this the first time. Subsequent runs will be quick.
 ```
-aws configure
-```
-Enter the appropriate information. Default output format is `None`. Your session information can be found on [the DARPA portal](https://darpa-ssith.awsapps.com/start#/)
-after clicking on "Command line or programmatic access". The configure script does not ask for a session token, so add that manually to your configuration:
-```
-echo "aws_session_token=<PASTE IN LONG STRING>" >> ~/.aws/credentials
+$ cd firesim
+$ ./start_docker.sh 
+[root@ba58e3742eae firesim]# 
 ```
 
-Now run the follow. Be sure to update your `FIRESIM_PREFIX` variable:
+Now source the local build setup script. This only has to be done once:
 ```
-export FIRESIM_PREFIX="YOUR_PREFIX_HERE"
-sudo yum -y install python-pip git
-sudo pip install boto3
-git clone https://github.com/DARPA-SSITH-Demonstrators/firesim.git
-cp firesim/scripts/aws-setup.py aws-setup.py
-python aws-setup.py
+[root@ba58e3742eae firesim]# source build-setup-local.sh
 ```
 
-Once the script finishes, you can terminate the instance.
-
-### Setup Manager
-
-The FireSim Manager instance is used to launch all builds and simulations. It is not actually an F1 instance itself.
-
-On the EC2 dashboard, launch a new instance
-* Step 1: Choose AMI -> Seach for the string `FPGA Developer AMI - 1.6.0`. There will be 2 results from **Community AMIs**. Select those results. Select the **1.6.0** developer AMI.
-* Step 2: Instance Type -> `t3.xlarge` could be a reasonable trade-off - 4 vCPUs with 16GB of RAM. **Note** This instance is quite a bit slower than the recommended `c5.4xlarge`. Consider using the larger instance to get everything setup the first time. You'll likely save money as it is well over 2x faster.
-* Step 3: Instance Details -> Select the `FIRESIM_PREFIX-firesim` Network VPC. The default subnet should be fine. It would be a good idea to select the `Enable Termination protection` option.
-This prevents others from terminating your instance (and losing all your data). Deselect the `T2/T3 Unlimited` option. In the `User data` field, copy/paste the script below into the box:
+Finally, run the firesim `managerinit` task to complete the initial setup. This process requests an email address
+to receive notifications when an AFI has been completed. If automating this setup, you can `echo` the address (or 
+an empty string) into the command:
 ```
-#!/bin/bash
-echo "machine launch script started" > /home/centos/machine-launchstatus
-sudo yum install -y mosh
-sudo yum groupinstall -y "Development tools"
-sudo yum install -y gmp-devel mpfr-devel libmpc-devel zlib-devel vim git java java-devel
-curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
-sudo yum install -y sbt texinfo gengetopt
-sudo yum install -y expat-devel libusb1-devel ncurses-devel cmake "perl(ExtUtils::MakeMaker)"
-# deps for poky
-sudo yum install -y python36 patch diffstat texi2html texinfo subversion chrpath git wget
-# deps for qemu
-sudo yum install -y gtk3-devel
-# deps for firesim-software (note that rsync is installed but too old)
-sudo yum install -y python36-pip python36-devel rsync
-# Install GNU make 4.x (needed to cross-compile glibc 2.28+)
-sudo yum install -y centos-release-scl
-sudo yum install -y devtoolset-8-make
-
-# install DTC. it's not available in repos in FPGA AMI
-DTCversion=dtc-1.4.4
-wget https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/$DTCversion.tar.gz
-tar -xvf $DTCversion.tar.gz
-cd $DTCversion
-make -j16
-make install
-cd ..
-rm -rf $DTCversion.tar.gz
-rm -rf $DTCversion
-
-# get a proper version of git
-sudo yum -y remove git
-sudo yum -y install epel-release
-sudo yum -y install https://repo.ius.io/ius-release-el7.rpm
-sudo yum --enablerepo=ius-archive -y install git2u
-
-# install verilator
-git clone http://git.veripool.org/git/verilator
-cd verilator/
-git checkout v4.028
-autoconf && ./configure && make -j16 && sudo make install
-cd ..
-
-# bash completion for manager
-sudo yum -y install bash-completion
-
-# graphviz for manager
-sudo yum -y install graphviz python-devel
-
-# these need to match what's in deploy/requirements.txt
-sudo pip2 install fabric==1.14.0
-sudo pip2 install boto3==1.6.2
-sudo pip2 install colorama==0.3.7
-sudo pip2 install argcomplete==1.9.3
-sudo pip2 install graphviz==0.8.3
-# for some of our workload plotting scripts
-sudo pip2 install --upgrade --ignore-installed pyparsing
-sudo pip2 install matplotlib==2.2.2
-sudo pip2 install pandas==0.22.0
-# new awscli on 1.6.0 AMI is broken with our versions of boto3
-sudo pip2 install awscli==1.15.76
-
-sudo activate-global-python-argcomplete
-
-# get a regular prompt
-echo "PS1='\u@\H:\w\\$ '" >> /home/centos/.bashrc
-echo "machine launch script completed" >> /home/centos/machine-launchstatus
-```
-* Step 4: Add Storage -> Remove the EBS volume. Increase the size of your default root volume to some reasonable amount. 100GB is a good starting point. This instance will be downloading many repos and building full linux images.
-* Step 5: Add Tags -> Add them if you'd like
-* Step 6: Security Group -> Be sure to select the `FIRESIM_PREFIX-firesim` security group after clicking `Select an existing security group`.
-* Review and Launch
-
-Once the instance is running, login using SSH and your key.
-
-```
-ssh -i ${YOUR_FIRESIM_PREFIX}-firesim.pem centos@<PUBLIC IP ADDR>
+[root@ba58e3742eae firesim]# firesim managerinit
+or
+[root@ba58e3742eae firesim]# echo "user@address.com" | firesim managerinit
+or
+[root@ba58e3742eae firesim]# echo "" | firesim managerinit
 ```
 
-The initial connection will take some time as the instance is running our setup script at startup.
-Once you are logged in, run:
-```
-tail -f ~/machine-launchstatus
-```
-and wait for the `machine launch script completed!` message before continuing. Ctrl-C to exit the tail command once it is finished.
+## Build an AFI
+Build recipes for the three supported CPUs have been provided for you. Feel free to change these as needed.
 
-Copy your private key to the instance at `~/${YOUR_FIRESIM_PREFIX}-firesim.pem`. This is required so FireSim can communicate with other instances it spins up.
-```
-scp -i ${YOUR_FIRESIM_PREFIX}-firesim.pem ${YOUR_FIRESIM_PREFIX}-firesim.pem centos@<PUBLIC IP ADDR>:
-```
-
-Clone the FireSim repo and start the setup process. Be sure to set your `FIRESIM_PREFIX` and that it matches the one used earlier.
-This variable will be stored in your FireSim configuration after the build process, so you should not have to set this again.
-```
-export FIRESIM_PREFIX="YOUR_FIRESIM_PREFIX"
-cd ~
-git clone https://github.com/DARPA-SSITH-Demonstrators/firesim.git
-cd firesim
-./build-setup.sh fast
-```
-You may have to enter your username and password for both github and gitlab-ext during this process. If you get it wrong and the
-process exits, just run `./build-setup.sh fast` again and it will continue from where it left off.
-
-The build process will take around 1-2 hours on this `t3.xlarge` instance.
-
-Source this file when the build process has finished.
-This step must be done every time you SSH into the FireSim Manager instance.
-```
-cd ~/firesim
-source sourceme-f1-manager.sh
-```
-
-Finally, initialize your manager instance. Note this script also requires the region to be set:
-```
-... Copy/Paste your current AWS Credentials into the prompt before continuing ...
-... AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN ...
-export AWS_DEFAULT_REGION="us-west-2"
-firesim managerinit
-```
-
-## Run Linux On Existing AFI
-
-If starting fresh, SSH into your manager instance, source the `sourceme-f1-manager.sh` file, and copy/paste your current credentials. Otherwise continue in the same SSH connection.
-
-We need to slightly modify the included Berkeley Boot Loader (`bbl`) to reflect the expected memory map of our GFE processors. Run the following commands to make this change
-and start the build process:
-```
-cd ~/firesim/sw/firesim-software
-./init-submodules.sh
-
-cd ~/firesim
-./gfe_fixes.sh
-
-cd ~/firesim/sw/firesim-software
-./marshal -v build br-base.json
-```
-This will take some time on this instance with only 4 vCPUs.
-
-Once it finishes, check that you have the files:
-* `~/firesim/sw/firesim-software/images/br-base-bin` - the bootloader and kernel image. This gets loaded directly into memory
-* `~/firesim/sw/firesim-software/images/br-base.img` - filesystem disk image, accessed via the block device
-
-Launch the F1 instance and start the simulation:
-```
-cd ~/firesim/deploy
-firesim launchrunfarm
-firesim infrasetup
-firesim runworkload
-```
-
-Pay attention to the output of each command to see what they do individually. The final command should display a screen similar to:
-```
-FireSim Simulation Status @ 2018-05-19 00:38:56.062737
---------------------------------------------------------------------------------
-This workload's output is located in:
-/home/centos/firesim/deploy/results-workload/2018-05-19--00-38-52-linux-uniform/
-This run's log is located in:
-/home/centos/firesim/deploy/logs/2018-05-19--00-38-52-runworkload-JS5IGTV166X169DZ.log
-This status will update every 10s.
---------------------------------------------------------------------------------
-Instances
---------------------------------------------------------------------------------
-Instance IP:   172.30.2.174 | Terminated: False
---------------------------------------------------------------------------------
-Simulated Switches
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-Simulated Nodes/Jobs
---------------------------------------------------------------------------------
-Instance IP:   172.30.2.174 | Job: linux-uniform0 | Sim running: True
---------------------------------------------------------------------------------
-Summary
---------------------------------------------------------------------------------
-1/1 instances are still running.
-1/1 simulations are still running.
---------------------------------------------------------------------------------
-```
-
-Take note of the `Instance IP` (`172.30.2.174` in the example above). Open a new SSH connection to your manager instance, source the FireSim `sourceme-f1-manager.sh` file and then run:
-```
-ssh <INSTANCE IP ADDR>
-```
-
-You are now logged into the F1 instance by way of your manager instance. This is the machine actually connected to the FPGA and running the simulation.
-
-FireSim automatically starts a console connection to the running FPGA. Open it:
-```
-screen -r fsim0
-```
-
-You should now see Linux booting up:
-```
-Commencing simulation.
-[    0.000000] OF: fdt: Ignoring memory range 0x80000000 - 0xc0200000
-[    0.000000] Forcing kernel command line to: console=hvc0 earlycon=sbi
-[    0.000000] Linux version 5.3.0-00002-g6a95b016aba5 (centos@ip-192-168-1-229.us-west-2.compute.internal) (gcc version 9.2.0 (GCC)) #1 SMP Wed May 13 07:57:25 UTC 2020
-[    0.000000] earlycon: sbi0 at I/O port 0x0 (options '')
-[    0.000000] printk: bootconsole [sbi0] enabled
-[    0.000000] initrd not found or empty - disabling initrd
-[    0.000000] Zone ranges:
-[    0.000000]   DMA32    [mem 0x00000000c0200000-0x00000000ffffffff]
-[    0.000000]   Normal   empty
-[    0.000000] Movable zone start for each node
-[    0.000000] Early memory node ranges
-[    0.000000]   node   0: [mem 0x00000000c0200000-0x00000000ffffffff]
-[    0.000000] Initmem setup node 0 [mem 0x00000000c0200000-0x00000000ffffffff]
-[    0.000000] software IO TLB: mapped [mem 0xfb1fc000-0xff1fc000] (64MB)
-[    0.000000] elf_hwcap is 0x112d
-[    0.000000] percpu: Embedded 18 pages/cpu s36312 r8192 d29224 u73728
-[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 258055
-...
-Mounting /dev/iceblk as root device
-[   10.658566] EXT4-fs (iceblk): mounted filesystem without journal. Opts: (null)
-Loaded platform drivers, booting from disk:
-[   12.500367] random: fast init done
-[   12.978251] EXT4-fs (iceblk): re-mounted. Opts: (null)
-Starting syslogd: OK
-Starting klogd: OK
-Running sysctl: OK
-Starting mdev: OK
-Initializing random number generator... [   26.690846] random: dd: uninitialized urandom read (512 bytes read)
-done.
-Starting network: OK
-[   43.698791] random: httpd: uninitialized urandom read (8 bytes read)
-[   43.714622] random: httpd: uninitialized urandom read (8 bytes read)
-[   43.733618] random: httpd: uninitialized urandom read (8 bytes read)
-AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppress this message
-Starting dropbear sshd: OK
-launching firesim workload run/command
-firesim workload run/command done
-
-Welcome to Buildroot
-buildroot login: root
-Password:
-# 
-```
-
-The login is **root** and the password is **firesim**.
-
-End the simulation by typing `poweroff -f` at the Linux prompt (on the target OS, not your instances). Then terminate the run farm as explained below.
-
-**Important**
-
-It is very easy to leave a FireSim F1 instance running and forget about it. These are limited resources and expensive. Back on your manager instance, be sure to run:
-```
-firesim terminaterunfarm
-```
-After you are done and answer 'yes' at the prompt. This will terminate your F1 instances.
-
-## Build Your Own Image
-A few build recipes have been preset for you. Feel free to change these as needed.
-
-First, define your build recipe in `~/firesim/deploy/config_build_recipes.ini`:
+First, define your build recipe in `firesim/deploy/config_build_recipes.ini`:
 ```
 ...
-[firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3]
+[firesim-cloudgfe-chisel-p2]
 DESIGN=FireSim
-TARGET_CONFIG=WithNIC_DDR3FRFCFSLLC4MB_WithBluespecP2_FireSimSSITHConfig
-PLATFORM_CONFIG=F50MHz_BaseF1Config
+TARGET_CONFIG=WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEChiselP2Config
+PLATFORM_CONFIG=F100MHz_BaseF1Config
 instancetype=z1d.2xlarge
 deploytriplet=None
 ```
@@ -350,26 +107,32 @@ deploytriplet=None
 Options generic to either Chisel or Bluespec cores:
 * `DESIGN=FireSim` sets the top-level scala class. It is very unlikely you'd want to change this
 * `TARGET_CONFIG` is passed to chipyard to build the actual SoC complex. Options can be combined.
-  * `WithNIC` adds the IceNIC at `0x62100000`
+  * `WithNIC` adds the IceNet NIC
   * `DDR3FRFCFSLLC4M` adds the standard DDR controller and L2 cache
-  * There are two underlying build configurations available, as explained below. `FireSimSSITHConfig` and `FireSimCloudGFEConfig`
-* `PATFORM_CONFIG` is used by FireSim to implement platform level options, such as the synthesis target frequency and underlying hardware (only F1 supported). Use `FXXMHz` to select the SoC's frequency. Good options are `F50MHz`, `F75MHz`, and `F90MHz`. Others may work as well.
-* `instancetype` sets the EC2 instance used to build the image. The default of `z1d.2xlarge` is a good balance between cost and speed. You'll need an instance with minimum 32GB of RAM.
+  * There are two main build strategies available, as explained below. `FireSimSSITHDropInConfig` and `FireSimCloudGFEChiselPXConfig`
+* `PATFORM_CONFIG` is used by FireSim to implement platform level options, such as the synthesis target frequency and underlying hardware (only F1 supported). Use `FXXMHz` to select the SoC's frequency. Good options are `F50MHz` and `F100MHz`. Others may work as well.
+* `instancetype` will be ignored by on-premise FireSim but is required to be set for compatibility
 * `deploytriplet` is currently unused
 
-UART and block devices are always included.
+**Note** The Bluespec P2 currently does not build cleanly at 100MHz. This core has been preconfigured to synthesize at 90MHz.
 
-### Build with a "BlackBox" SSITH Core - `FireSimSSITHConfig`
+### Build with a "DropIn" SSITH Core - `FireSimSSITHDropInConfig`
 
-This flow currently works for BSV-based processors. Follow the instructions in the SSITH chipyard README to customize the core (to come).
+This flow enables "dropping in" any processor core that conforms to the expected GFE subsystem. It currently works for BSV-based processors, but would also work for
+chisel processors compiled to verilog with some modifications. Information on adding new drop-in cores can be found in the chipyard repo README (to come).
 
-Adding the `WithBluespecP2` modifier specifies to use the BSV P2 repo as the blackbox core (default).
+For FireSim, you can select the drop-in replacement using an optional modifier in the `TARGET_CONFIG` recipe.
 
-### Build with a CloudGFE P2 Core (Chisel based) - `FireSimCloudGFEConfig`
+Available drop-ins:
+* `WithBluespecP2` - specifies to use the BSV P2 (Flute) repo as the blackbox core (default).
 
-This flow builds chisel-based processors directly. Follow the instructions in the SSITH chipyard README for more information on customizing the core (to come).
+### Build with a CloudGFE P1 Core (Chisel based) - `FireSimCloudGFEChiselP1Config`
 
-Then use the `FireSimCloudGFEConfig` configuration in your `TARGET_CONFIG`, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEConfig`.
+This flow compiles a P1 (32-bit) processor directly from Chisel source. Append this configuration option to the end of the `TARGET_CONFIG` string, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEChiselP1Config`.
+
+### Build with a CloudGFE P2 Core (Chisel based) - `FireSimCloudGFEChiselP2Config`
+
+This flow compiles a P2 (64-bit) processor directly from Chisel source. Append this configuration option to the end of the `TARGET_CONFIG` string, ex: `WithNIC_DDR3FRFCFSLLC4MB_FireSimCloudGFEChiselP2Config`.
 
 ### Continuing the build
 
@@ -378,60 +141,103 @@ Now define your build tag in `~/firesim/deploy/config_build.ini`:
 [builds]
 # this section references builds defined in config_build_recipes.ini
 # if you add a build here, it will be built when you run buildafi
-#firesim-bluespec_p2-ssithcore-no-nic-l2-llc4mb-ddr3
-firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3
+#firesim-cloudgfe-chisel-p2
+#firesim-cloudgfe-chisel-p1
+firesim-cloudgfe-bluespec-p2
 ```
 
-You can specify multiple builds, but your AWS account may not have sufficient vCPU limits to support concurrent builds. You can also add your build tag to the `agfitoshare` section, which will
+It is possible to specify multiple builds, but full functionality for this approach is not yet implemented. FireSim will only build the first AFI in the list. It will generate software packages (described later) for all listed builds.
+You can also add your build tag to the `agfitoshare` section, which will
 automatically share the final AFIs with any accounts listed in the `sharewithaccounts` section.
 
-Now launch the build. It's strongly encouraged to use `screen` or `mosh` to launch the build process. If your SSH connection dies during the build, which could take 5-6 hours, the build process may not finish.
+Now launch the build. It takes about 5-6 hours:
 ```
-screen
-firesim buildafi
+[root@ba58e3742eae firesim]# firesim buildafi
 ```
 
-FireSim will first build the verilog netlist with your chosen build recipe using chipyard. It will then package up the netlist with other AWS components and send them
-to a build instance where Vivado is actually executed.
-
-At the end of the build process, the manager instance will submit your Vivado checkpoint to AWS for final encryption and packaging. 
+At the end of the build process, assuming your AWS credentials are still valid, FireSim will submit your Vivado checkpoint to AWS for final encryption and packaging. 
 You'll see a continuous stream of `Pending...` messages while this is happening. It can take up to an hour.
 
-If your SSH connection and AWS credentials remained active, you'll receive an e-mail when the build is finished with the configuration blurb to add to `~/firesim/deploy/config_hwdb.ini`.
+If you provided an email address during the `managerinit` task, you'll also receive an e-mail when the build is finished with the configuration blurb to add to `~/firesim/deploy/config_hwdb.ini`.
 It will also be printed in the terminal window and saved to a file in `~/firesim/deploy/built-hwdb-entries`.
 
-Finally add the new image to `~/firesim/deploy/config_hwdb.ini`. Example:
+### Update HWDB
+
+FireSim uses a `hwdb` file to track generated AFIs. This file is not updated automatically by FireSim.
+After building an AFI, you will need to add your newly created image to the database either manually or using:
 ```
-[firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3e
-agfi=agfi-0e9a472782e8e53c2
-deploytripletoverride=None
-customruntimeconfig=None
+[root@ba58e3742eae firesim]# cat deploy/built-hwdb-entries/firesim-cloudgfe-* > deploy/config_hwdb.ini
 ```
 
-And update `~/firesim/deploy/config_runtime.ini` to point to the new tag:
+This must be done before building the software support package to ensure the correct AGFI identifier is used.
+
+### Build Software Support Package
+
+A new task has been aded to FireSim On Prem that generates software packages for the F1 host instance:
+
 ```
-# This references a section from config_hwconfigs.ini
-# In homogeneous configurations, use this to set the hardware config deployed
-# for all simulators
-#defaulthwconfig=firesim-rocket-quadcore-nic-l2-llc4mb-ddr3
-#defaulthwconfig=firesim-rocket-singlecore-no-nic-l2-llc4mb-ddr3
-defaulthwconfig=firesim-bluespec_p2-ssithcore-nic-l2-llc4mb-ddr3
+[root@ba58e3742eae firesim]# firesim buildlocalsw
 ```
 
-Note: You can build new AFIs under existing tags and just update the `agfi=<AGFI Number>` option in `config_hwdb.ini` when it is finished building.
-
-Now you can follow the instructions above for running Linux on your new build.
-
-## Notes and Future Additions
-* You can transfer binaries to the F1 instance and run the simulation manually from there. Roughly:
+The output software package include:
 ```
-sudo fpga-clear-local-image -S 0
-sudo fpga-load-local-image -S 0 -I AFI_ID
-cd ~/sim_slot_0
-./VFireSim ~/path/to/elf/file ... options to come ...
+sw
+├── kmods
+│   ├── nbd.ko
+│   └── xdma.ko
+├── setup.sh
+├── sim
+│   ├── FireSim.asserts
+│   ├── FireSim-f1
+│   ├── kill_sim.sh
+│   ├── libdwarf.so.1
+│   ├── libelf.so.1
+│   ├── run_sim.sh
+│   ├── runtime.conf
+│   └── switch0
+└── support
+    └── switchconfig.h
 ```
-This will dump the UART output to the console. You can Ctrl-C to stop the simulation (does not clear the FPGA slot).
 
-* Networking does not work out of the box. Need to make some modifications to the switch software and run iptables setup on the F1 instance manually. Will document
-so we can decide if this should be automated in FireSim or just used in our own solution
+`setup.sh` will configure the F1 instance and load the necessary kernel modules.
+
+`sim/run_sim.sh` is a sample run script that sets up networking and executes the `FireSim-f1` simulator with the proper arguments, including a block device image and provided ELF.
+
+The FireSim `buildlocalsw` task will populate this folder for you, currently preforming the following tasks:
+* Copy initial skeleton from `firesim/platforms/f1/run-skel`
+* Build `FireSim-f1` executable based on actual SoC configuration
+* Build `xdma.ko` kernel module from source
+  * Currently this primarily supports the exact kernel version of the `FPGA Developer 1.6.0` AMI. But others may work
+* Copies the current version of `libdwarf` and `libelf` from the RISC-V Toolchain
+* Builds the switch software, `switch0`, which generates the `tap0` device to communicate between host and FPGA ethernet
+* Populates the run script with the correct AGFI and configuration names
+* Generates a tgz package
+* Uploads the tgz package to AWS S3
+
+The software package uploads to `s3://firesim-localuser/swpkgs/firesim-cloudgfe-processor-PX-sw.tgz` by default.
+
+**Important** The build flow requires a consistent environment between where `firesim buildlocalsw` is run and the F1 instance.
+This means the general OS version, installed packages, and even kernel version should match as closely (or exactly) as possible.
+
+## Automation Summary
+
+To automate building AFIs and distributing software, your flow should:
+* Set the proper SSH keys, key forwarding, etc to ensure access to both github.com and gitlab-ext.galois.com
+* Checkout the firesim repo and use a FireSim On Prem enabled branch (such as this one)
+* Populate fresh AWS credentials using environmental variables that will remain active for at least 5 hours, including `AWS_DEFAULT_REGION`
+* (Recommended) Start Docker by running `./start_docker.sh`
+* Run `source ./build-setup-local.sh`
+  * If you don't source this script, you either need to restart docker or run `source sourceme-f1-manager.sh`
+* Run `echo "" | firesim managerinit`
+  * Or populate an email address that will receive notifications
+* Modify `deploy/config_build.ini` and `deploy/config_build_recipes.ini` if necessary.
+  * You'll want to at least set the default build target if that is not set by the branch
+* Build the AFI using `firesim buildlocalafi`
+* Update the hwdb using `cd deploy; cat built-hwdb-entries/firesim-cloudgfe-* > config_hwdb.ini`
+* Build and deploy the corresponding software package: `firesim buildlocalsw`
+
+At the end of this process, you'll have an AFGI identifier and a software package stored on S3 to go with it.
+
+**Notes**
+* The `nbd.ko` module is not currently re-compiled from source. It's unclear if this module is actually required, so that has been left as a 'to-do'. The provided kernel module is compatible with CentOS 7.6 (FPGA Developer AMI)
 

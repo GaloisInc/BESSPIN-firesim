@@ -148,6 +148,23 @@ def buildafi(globalbuildconf):
     # run builds, then terminate instances
     execute(aws_build, globalbuildconf, hosts=globalbuildconf.get_build_instance_ips())
 
+def buildlocalafi(globalbuildconf):
+    """ Starting from local Chisel, build an AFI for all of the specified
+    hardware configs. """
+
+    auto_create_bucket(globalbuildconf.s3_bucketname)
+
+    for buildconf in globalbuildconf.get_builds_list():
+        execute(replace_rtl, globalbuildconf, buildconf, hosts=['localhost'])
+
+    # run builds, then terminate instances
+    execute(local_build, globalbuildconf, hosts=['localhost'])
+
+def buildlocalsw(globalbuildconf):
+    """ Build a distributable software package for the current build target """
+    auto_create_bucket(globalbuildconf.s3_bucketname)
+    for buildconf in globalbuildconf.get_builds_list():
+        execute(local_sw_pkg, globalbuildconf, buildconf, hosts=['localhost'])
 
 def runcheck(runtime_conf):
     """ Do nothing, just let the config process run. """
@@ -202,6 +219,8 @@ def construct_firesim_argparser():
                         help='Management task to run.', choices=[
                             'managerinit',
                             'buildafi',
+                            'buildlocalafi',
+                            'buildlocalsw',
                             'launchrunfarm',
                             'infrasetup',
                             'boot',
@@ -264,11 +283,17 @@ def main(args):
     if args.task == 'managerinit':
         managerinit()
 
-    if args.task == 'buildafi' or args.task == 'shareagfi':
+    if args.task == 'buildafi' or args.task == 'shareagfi' or args.task == 'buildlocalafi':
+        buildconfig = GlobalBuildConfig(args)
+        globals()[args.task](buildconfig)
+
+    if args.task == 'buildlocalsw':
         buildconfig = GlobalBuildConfig(args)
         globals()[args.task](buildconfig)
 
     if args.task == 'terminaterunfarm':
+        if "FIRESIM_LOCAL" in os.environ:
+            raise Exception("{} is not available when running the localized version of FireSim.".format(args.task))
         runtime_conf = RuntimeConfig(args)
         terminaterunfarm(runtime_conf, args.terminatesomef116,
                          args.terminatesomef14,
@@ -276,6 +301,8 @@ def main(args):
                          args.forceterminate)
 
     if args.task in ['launchrunfarm', 'infrasetup', 'boot', 'kill', 'runworkload', 'runcheck']:
+        if "FIRESIM_LOCAL" in os.environ:
+            raise Exception("{} is not available when running the localized version of FireSim.".format(args.task))
         # construct simulation config
         simconf = RuntimeConfig(args)
         # run task
