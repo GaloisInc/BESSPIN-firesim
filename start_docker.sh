@@ -3,7 +3,7 @@
 
 base_dir=$(pwd)
 
-DOCKER_CONTAINER=firesim_runtime
+DOCKER_CONTAINER=artifactory.galois.com:5008/firesim:runtime
 
 DOCKER_OPTS=(-it)
 DOCKER_OPTS+=(-e FIRESIM_HOST_PATH=${base_dir})

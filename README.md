@@ -39,13 +39,13 @@ There are now quick-setup packages available that use pre-built Linux/FreeBSD im
 
 Two docker containers have been created to make running FireSim on premises easier.
 
-The first, `artifactory.galois.com:5008/firesim:sw_gen`, contains all the necessary packages for running FireSim scripts, building netlists from Chisel, and compiling support software (host-side communication binaries, kernel modules, etc).
+The first, `artifactory.galois.com:5008/firesim:runtime`, contains all the necessary packages for running FireSim scripts, building netlists from Chisel, and compiling support software (host-side communication binaries, kernel modules, etc).
 
 The second, `artifactory.galois.com:5008/firesim:bitstream_gen`, contains the correct version of Vivado and the AWS F1 license to build the Vivado design files for AWS to convert into AFIs.
 
 It is possible to run this version of FireSim without either of these docker containers, but that process is not documented here. See [the docker build scripts](https://gitlab-ext.galois.com/ssith/docker-tools) for an example of the environment you'll need to create.
 
-**Note** It is assumed the environment you are running FireSim in matches that of the F1 instances you'll eventually use. For example, if you run this on Debian Buster, you'll need to set the F1 instance's AMI to match. The `sw_gen` docker container has been carefully matched to the `FPGA Developer 1.6.0` AMI.
+**Note** It is assumed the environment you are running FireSim in matches that of the F1 instances you'll eventually use. For example, if you run this on Debian Buster, you'll need to set the F1 instance's AMI to match. The `runtime` docker container has been carefully matched to the `FPGA Developer 1.6.0` AMI.
 
 ### One-Time Setup
 
@@ -232,3 +232,7 @@ To automate building AFIs and distributing software, your flow should:
 * Build and deploy the corresponding software package: `firesim buildlocalsw`
 
 At the end of this process, you'll have an AFGI identifier and a software package stored on S3 to go with it.
+
+**Notes**
+* The `nbd.ko` module is not currently re-compiled from source. It's unclear if this module is actually required, so that has been left as a 'to-do'. The provided kernel module is compatible with CentOS 7.6 (FPGA Developer AMI)
+
