@@ -8,9 +8,14 @@
     2. [FireSim Docker Containers](#firesim-docker-containers)
     3. [One-Time Setup](#one-time-setup)
     4. [Setup Manager](#setup-manager)
-3. [Run Linux on Existing AFI](#run-linux-on-existing-afi)
-4. [Build Your Own Image](#build-your-own-image)
-5. [Notes and Future Additions](#notes-and-future-additions)
+4. [Build an AFI](#build-an-afi)
+    1. [Build with a Drop-In Core](#build-with-a-dropin-ssith-core---firesimssithdropinconfig)
+    2. [Build with a Chisel P1](#build-with-a-cloudgfe-p1-core-chisel-based---firesimcloudgfechiselp1config)
+    3. [Build with a Chisel P2](#build-with-a-cloudgfe-p2-core-chisel-based---firesimcloudgfechiselp2config)
+    4. [Continuing the Build](#continuing-the-build)
+    5. [Update HWDB](#update-hwdb)
+    6. [Build Software Support Package](#build-software-support-package)
+5. [Automation Summary](#automation-summary)
 
 ## What is FireSim On Prem?
 
