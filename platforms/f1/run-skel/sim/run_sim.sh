@@ -7,6 +7,17 @@ ELF_FILE=$3
 AGFI=FIRESIM_AGFI
 CONFIG=FIRESIM_CONFIG
 
+# Tracing Support
+#
+# You can dump a processor trace (PC + instruction) to a text file for debugging.
+# Set the TRACE_START and TRACE_END parameters below to specify which cycles you'd
+# like to capture. This WILL slow down your simulation, and the trace files become
+# very large quickly. So it should be used sparingly. You will also need to add
+# `+tracefile0=TRACEFILE` to the FireSim-f1 argument list at the end of this file
+
+TRACE_START=0
+TRACE_END=1
+
 if [ -z $BLKIMG ] || [ -z $DWARF_FILE ] || [ -z $ELF_FILE ]
 then
 	echo "ERROR: Please specify correct arguments"
@@ -101,8 +112,8 @@ screen -S fsim0 -m bash -c "script -f -c 'stty intr ^] && sudo LD_LIBRARY_PATH=.
 +niclog0=niclog0 \
 +blkdev-log0=blkdev-log0 \
 +trace-select0=1 \
-+trace-start0=0 \
-+trace-end0=-1 \
++trace-start0=${TRACE_START} \
++trace-end0=${TRACE_END} \
 +trace-output-format0=0 \
 +dwarf-file-name0=${DWARF_FILE} \
 +autocounter-readrate0=0 \
@@ -111,3 +122,6 @@ screen -S fsim0 -m bash -c "script -f -c 'stty intr ^] && sudo LD_LIBRARY_PATH=.
 +netbw0=200 \
 +shmemportname0=0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 \
 +permissive-off ${ELF_FILE} && stty intr ^c' uartlog; sleep 1"
+
+# If we're reached this point, we can clean up
+./kill_sim.sh

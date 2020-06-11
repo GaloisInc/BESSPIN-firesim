@@ -2,13 +2,12 @@
 package firesim.bridges
 
 import midas.widgets._
-
 import chisel3._
 import chisel3.util._
 import chisel3.experimental.{DataMirror, Direction}
 import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.subsystem.PeripheryBusKey
-import sifive.blocks.devices.uart.{UARTPortIO, PeripheryUARTKey}
+import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTParams, UARTPortIO}
 
 //Note: This file is heavily commented as it serves as a bridge walkthrough
 //example in the FireSim docs
@@ -44,8 +43,8 @@ class UARTBridge(implicit p: Parameters) extends BlackBox
 
   // Do some intermediate work to compute our host-side BridgeModule's constructor argument
   val frequency = p(PeripheryBusKey).frequency
-  val baudrate = 3686400L
-  val div = (p(PeripheryBusKey).frequency / baudrate).toInt
+  val baudrate: Int = p(PeripheryUARTKey).headOption.getOrElse(UARTParams(0)).fixedBaudRate.getOrElse(3686400)
+  val div = (p(PeripheryBusKey).frequency / BigInt(baudrate)).toInt
 
   // And then implement the constructorArg member
   val constructorArg = Some(UARTKey(div))
