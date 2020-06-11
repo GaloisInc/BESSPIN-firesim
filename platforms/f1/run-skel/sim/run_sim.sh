@@ -122,3 +122,6 @@ screen -S fsim0 -m bash -c "script -f -c 'stty intr ^] && sudo LD_LIBRARY_PATH=.
 +netbw0=200 \
 +shmemportname0=0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 \
 +permissive-off ${ELF_FILE} && stty intr ^c' uartlog; sleep 1"
+
+# If we're reached this point, we can clean up
+./kill_sim.sh
