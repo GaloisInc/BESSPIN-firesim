@@ -8,14 +8,13 @@ die() { echo "$*" 1>&2; exit 1; }
 
 base_dir=$(pwd)
 
-if [ ! -f .finished_awsfpga ]
+if [ ! -f /usr/bin/fpga-load-local-image ]
 then
 	echo "Getting AWS FPGA SDK"
 	git clone https://github.com/aws/aws-fpga || die "Cloning FPGA SDK failed"
 	cd aws-fpga && git checkout 6c707ab4a26c2766b916dad9d40727266fa0e4ef
 	source sdk_setup.sh || die "Building FPGA SDK failed..."
 	cd ..
-	touch .finished_awsfpga
 fi
 
 # Just try removing all modules anyway.. no harm
