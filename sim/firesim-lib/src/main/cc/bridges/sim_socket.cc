@@ -11,7 +11,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...)  fprintf(stdout, __VA_ARGS__)
