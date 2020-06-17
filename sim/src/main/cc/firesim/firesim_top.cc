@@ -6,6 +6,7 @@
 #include "bridges/random.h"
 #include "bridges/serial.h"
 #include "bridges/uart.h"
+#include "bridges/dmi.h"
 #include "bridges/simplenic.h"
 #include "bridges/blockdev.h"
 #include "bridges/tracerv.h"
@@ -84,6 +85,11 @@ firesim_top_t::firesim_top_t(int argc, char** argv)
 #ifdef RANDOMBRIDGEMODULE_0_PRESENT
     RANDOMBRIDGEMODULE_0_substruct_create;
     add_bridge_driver(new random_t(this, args, RANDOMBRIDGEMODULE_0_substruct));
+#endif
+
+#ifdef DMIBRIDGEMODULE_0_PRESENT
+    DMIBRIDGEMODULE_0_substruct_create;
+    add_bridge_driver(new dmi_t(this, args, DMIBRIDGEMODULE_0_mmint_present, DMIBRIDGEMODULE_0_substruct));
 #endif
 
 std::vector<uint64_t> host_mem_offsets;
