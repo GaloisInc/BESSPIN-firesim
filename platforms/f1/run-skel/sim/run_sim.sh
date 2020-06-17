@@ -18,12 +18,34 @@ CONFIG=FIRESIM_CONFIG
 TRACE_START=0
 TRACE_END=1
 
+# Debugger Support
+#
+# You can connect gdb to this simulator via a custom version of OpenOCD.
+#
+# To download the toolchain, run:
+# aws s3 cp s3://firesim-localuser/cloudgfe-riscv-toolchain.tgz .
+#
+# Then extract it to ~/riscv-tools-install
+#
+# When you enable debug below, the simulator will wait until gdb is connected.
+# The ELF file provided to this script will still be pre-loaded into memory, making
+# it unnecessary to run `load` within gdb to start. Use the provided init.gdb script
+# along with openocd.cfg to connect. The pc will be set to main memory by init.gdb
+
+DEBUG_ENABLE=0
+
 if [ -z $BLKIMG ] || [ -z $DWARF_FILE ] || [ -z $ELF_FILE ]
 then
 	echo "ERROR: Please specify correct arguments"
 	echo "$0 <blockimage> <dwarf> <elf>"
 	exit -1
 fi
+
+DEBUG_ARGS=""
+if [ "$DEBUG_ENABLE" == "1" ]
+then
+	DEBUG_ARGS="+debug_enable"
+fi	
 
 echo "Checking Network Config"
 if [ -z "$(sudo ip link show | grep tap)" ]
@@ -105,6 +127,7 @@ screen -S fsim0 -m bash -c "script -f -c 'stty intr ^] && sudo LD_LIBRARY_PATH=.
 +mm_llc_setBits=12 \
 +mm_llc_blockBits=7 \
 +mm_llc_activeMSHRs=8 \
+${DEBUG_ARGS} \
 +slotid=0 \
 +profile-interval=-1 \
 +macaddr0=00:12:6D:00:00:02 \
