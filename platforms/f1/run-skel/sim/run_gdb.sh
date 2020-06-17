@@ -19,11 +19,11 @@ then
 	echo "RISCV Tools not installed in expected location. Installing now..."
 	if [ ! -f ~/cloudgfe-riscv-toolchain.tgz ]
 	then
-		aws s3 cp s3://firesim-localuser/cloudgfe-riscv-toolchain.tgz ~/cloudgfe-riscv-toolchain.tgz || die
+		aws s3 cp s3://firesim-localuser/swpkgs/cloudgfe-riscv-toolchain.tgz ~/cloudgfe-riscv-toolchain.tgz || die
 	else
-		"Found an existing tgz. Using it."
+		echo "Found an existing tgz. Using it."
 	fi		
-	tar czf ~/cloudgfe-riscv-toolchain.tgz -C ~ || die
+	tar xzf ~/cloudgfe-riscv-toolchain.tgz -C ~ || die
 	echo "Installed!"
 fi
 
@@ -36,4 +36,5 @@ then
 fi
 
 echo "Starting gdb"
+mkdir -p logs
 riscv64-unknown-elf-gdb -x init.gdb $1
