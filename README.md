@@ -18,7 +18,8 @@
 5. [Automation Summary](#automation-summary)
 6. [Additional Devices](#additional-devices)
     1. [RNG](#rng)
-
+    2. [DMIBridge](#dmibridge)
+    
 ## What is FireSim On Prem?
 
 FireSim is an [open-source](https://github.com/firesim/firesim) cycle-accurate
@@ -281,3 +282,23 @@ However, a fully safe approach would be to first poll the Status register to che
 
 ##### Linux
 Our Debian Linux builds will now include the driver for the HW RNG and `rng-tools`, which will seed the Linux random API with random values from `/dev/hwrng`. Your programs can either use the standard `/dev/random` or `/dev/urandom` interfaces, or they can access the HW RNG directly with `/dev/hwrng`.
+
+### DMIBridge
+
+This bridge exposes the DMI interface to the host. It enables sending requests and receiving responses from the debug module. This has been combined with existing code that implements a JTAG state machine in C, bridging OpenOCD's `jtagvpi` interface to the exposed DMI interface. Putting everything together, it is now possible to connect `gdb` directly to the core running inside FireSim.
+
+This functionality is enabled by adding the `+debug_enable` argument to `FireSim-f1`. You can also optionally specify a port number for the `jtagvpi` socket to OpenOCD using `+debug_port=NUMBER`. The port number defaults to `5555`.
+
+A sample `openocd.cfg` and `init.gdb` have been included with the proper configuration options in `platforms/f1/run-skel/sim/`. `run_gdb.sh` in the same folder wraps all the commands into a simple script.
+
+#### Under The Hood
+
+The `gdb <-> openocd <-> jtagvpi <-> dmi <-> DebugModule` connection is currently capped at 30KB/sec, therefore some additional changes were made to help with loading large binaries. The host-side `dmi_t` C++ bridge software will set a `dbg_connected` bit inside the target's `DMIBridge` device when you enable debugging using `+debug_enable`. This bit is further populated to the `MMInt` device, which is used to mimic the `CLINT` in our FireSim SoC. This flag is exposed to the CPU in an additional read-only register. This all happens before the core is released from reset. `bootrom.cloudgfe.S` has been updated to immediately check if the debugger is connected, and if so, set `$a0` and `$a1` with the appropriate values before jumping to a `wfi` loop. It will not initialize the PLIC, interrupts, or set any additional options as it normally would.
+
+Then, FireSim is allowed to populate the memory with the given ELF. `MMInt` intercepts the "start" message that would normally kickoff booting from main memory and instead raises a flag that the `dmi_t` bridge software polls to determine when ELF loading has finished. Only at this point does it actually allow OpenOCD to connect to the debug module.
+
+In short, this means by the time `gdb` connects to the core, the memory has already been populated and the `$a0` and `$a1` registers have been properly set for the `bbl` bootloader to run. `gdb` can set the PC to `0xC0000000` and start debugging the chosen program.
+
+#### Using GDB
+
+First enable debug support in `run_sim.sh`. Set `DEBUG_ENABLE=1` near the top of the script. When you run `./run_sim.sh`, it will pause early waiting for the debugger to connect. Use your favorite multi-terminal approach (creating a new screen tab, disconnecting from screen, or starting a new SSH connection) to run `./run_gdb.sh <elf_file>` with the same ELF. The RISCV toolchain will be automatically downloaded if necessary and gdb will start. Once connected, the FireSim simulation will continue. `gdb` starts in the halted state with the memory pre-populated with your ELF file (no need to run `load`).
