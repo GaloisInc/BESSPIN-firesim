@@ -15,6 +15,7 @@ random_t::random_t(simif_t* sim, const std::vector<std::string>& args,
     this->mmio_addrs = mmio_addrs;
     this->random_fd = NULL;
     this->threshold = 0;
+    this->count = 0;
     this->override_threshold = false;
 
     std::string threshold_arg = std::string("+random_threshold=");
@@ -43,12 +44,13 @@ void random_t::init() {
     }
     this->random_fd = fopen("/dev/urandom", "r");
     if (this->random_fd == NULL) {
-	printf("[RAND] Error opening /dev/urandom = %d\n", this->random_fd);
+        printf("[RAND] Error opening /dev/urandom = %d\n", this->random_fd);
     }
 }
 
 void random_t::finish() {
     if (this->random_fd != NULL) {
+        printf("[RAND] Closing random device. Sent %d bytes to target\n", this->count*4);
         fclose(random_fd);
     }
 }
@@ -56,17 +58,15 @@ void random_t::finish() {
 void random_t::fill() {
     uint32_t random_val;
     ssize_t result;
-    uint32_t count;
-    count = 0;
     while (read(this->mmio_addrs->in_ready)) {
        result = fread(&random_val, sizeof(random_val), 1, this->random_fd);
        if (result < 0) {
            printf("[RAND] error reading from /dev/urandom = %d\n", result);
        } else {
-           printf("[RAND] Writing to target: count = %03d | data = 0x%x\n", count, random_val);
+           // printf("[RAND] Writing to target: count = %03d | data = 0x%x\n", count, random_val);
            write(this->mmio_addrs->in_bits, random_val);
            write(this->mmio_addrs->in_valid, true);
-           count++;
+           this->count++;
        }
     }
 }

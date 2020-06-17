@@ -21,6 +21,7 @@ class random_t: public bridge_driver_t
         void fill();
 	FILE* random_fd;
 	uint32_t threshold;
+	uint64_t count;
 	bool override_threshold;
 };
 #endif // RANDOMBRIDGEMODULE_struct_guard
