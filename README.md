@@ -16,6 +16,8 @@
     5. [Update HWDB](#update-hwdb)
     6. [Build Software Support Package](#build-software-support-package)
 5. [Automation Summary](#automation-summary)
+6. [Additional Devices](#additional-devices)
+    1. [RNG](#rng)
 
 ## What is FireSim On Prem?
 
@@ -241,3 +243,41 @@ At the end of this process, you'll have an AFGI identifier and a software packag
 **Notes**
 * The `nbd.ko` module is not currently re-compiled from source. It's unclear if this module is actually required, so that has been left as a 'to-do'. The provided kernel module is compatible with CentOS 7.6 (FPGA Developer AMI)
 
+## Additional Devices
+
+New bridges have been introduced for use in the SSITH program.
+
+### RNG
+
+The RandomBridge interfaces with a new `SSITHRNG` device connected to the SoC at address `0x63000000`. This device was designed to be software compatible with the STMicroelectronics HW RNG; specifically the [st-rng.c](https://github.com/torvalds/linux/blob/master/drivers/char/hw_random/st-rng.c) Linux driver. However, this simple interface can be used with any OS or bare metal program.
+
+The device contains a 4-entry deep FIFO that is constantly filled with 32-bit random values. In FireSim, these values are sourced from the host OS's `/dev/random` device, so their quality will match that of the host machine. FireSim first transfers the values into a different 128-entry queue, which then feeds `SSITHRNG`. Once the 128-entry queue empties to a software programmable threshold value (defaults to 16), FireSim will refill the remaining queue space in a burst operation. This effectively keeps the internal RNG device consistently fed.
+
+There are two registers defined:
+```
+(offset from 0x63000000)
+0x20 -> Status Register (8-bits)
+0x24 -> Random Data Register (32-bits)
+```
+
+#### Status Register
+
+_0x63000020_
+
+There are only 2 bits of the status register currently used. Bit 5 is `FIFO_FULL`, indicating the SSITHRNG has 4 random values available. Bit 6 is `FIFO_NOTEMPTY`, indicating there is at least one random value available. 
+
+#### Data Register
+
+_0x63000024_
+
+The data register returns a single 32-bit random word. On every read operation, the current value is drained from the FIFO automatically allowing a new value to be added.
+
+#### Operation
+
+##### Bare Metal / Non-Debian OS
+It should be safe to simply read directly from the Data Register repeatedly. By the time the RISC-V CPU's first read operation could reach the SSITHRNG, the FIFO will already be completely full. And it is very unlikely the device will run out of random values due to how host-to-target communication in FireSim works.
+
+However, a fully safe approach would be to first poll the Status register to check if either bits 5 or 6 are set. Check bit 6 if you only need a single value for some period of time. Use bit 5 if you need multiple data words. It allows you to write a slightly more performant loop that can safely request 4 random words before polling the status register again.
+
+##### Linux
+Our Debian Linux builds will now include the driver for the HW RNG and `rng-tools`, which will seed the Linux random API with random values from `/dev/hwrng`. Your programs can either use the standard `/dev/random` or `/dev/urandom` interfaces, or they can access the HW RNG directly with `/dev/hwrng`.
