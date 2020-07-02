@@ -59,7 +59,7 @@ It is possible to run this version of FireSim without either of these docker con
 
 There is a one-time setup required to initialize your FireSim system.
 
-If you plan on interacting with AWS directly (to create AFIs, share them, etc), set your AWS credentials using environmental variables. These can be easily copy/pasted from the [DARPA portal](https://darpa-ssith.awsapps.com/start#/):
+If you plan on interacting with AWS directly (to create AFIs, share them, etc), set your AWS credentials using environmental variables. If you plan to disable AWS, this step can be skipped. The values can be easily copy/pasted from the [DARPA portal](https://darpa-ssith.awsapps.com/start#/):
 ```
 export AWS_ACCESS_KEY_ID=...
 export AWS_SECRET_ACCESS_KEY=...
@@ -69,8 +69,6 @@ export AWS_DEFAULT_REGION='us-west-2'
 Be sure to add your default region, which is not included on the DARPA page.
 
 It's also strongly advised to use SSH key forwarding or `ssh-agent` to manage access to both github.com and gitlab-ext.galois.com. Repos are spread across these two sites. The docker start script will automatically pass-through an SSH agent configuration.
-
-If you are not using AWS or cannot use AWS, you can skip these steps.
 
 If using docker, start the environment using the `./start_docker.sh` script. If you don't already have the docker image downloaded, it will take some time to run this the first time. Subsequent runs will be quick.
 ```
