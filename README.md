@@ -59,7 +59,7 @@ It is possible to run this version of FireSim without either of these docker con
 
 There is a one-time setup required to initialize your FireSim system.
 
-First, set your AWS credentials using environmental variables. These can be easily copy/pasted from the [DARPA portal](https://darpa-ssith.awsapps.com/start#/):
+If you plan on interacting with AWS directly (to create AFIs, share them, etc), set your AWS credentials using environmental variables. These can be easily copy/pasted from the [DARPA portal](https://darpa-ssith.awsapps.com/start#/):
 ```
 export AWS_ACCESS_KEY_ID=...
 export AWS_SECRET_ACCESS_KEY=...
@@ -69,6 +69,8 @@ export AWS_DEFAULT_REGION='us-west-2'
 Be sure to add your default region, which is not included on the DARPA page.
 
 It's also strongly advised to use SSH key forwarding or `ssh-agent` to manage access to both github.com and gitlab-ext.galois.com. Repos are spread across these two sites. The docker start script will automatically pass-through an SSH agent configuration.
+
+If you are not using AWS or cannot use AWS, you can skip these steps.
 
 If using docker, start the environment using the `./start_docker.sh` script. If you don't already have the docker image downloaded, it will take some time to run this the first time. Subsequent runs will be quick.
 ```
@@ -82,15 +84,33 @@ Now source the local build setup script. This only has to be done once:
 [root@ba58e3742eae firesim]# source build-setup-local.sh
 ```
 
-Finally, run the firesim `managerinit` task to complete the initial setup. This process requests an email address
+Finally, run either the firesim `managerinit` or `managerinit_noaws` task to complete the initial setup. 
+The regular (not `_noaws`) task requests an email address
 to receive notifications when an AFI has been completed. If automating this setup, you can `echo` the address (or 
-an empty string) into the command:
+an empty string) into the command. If you cannot connect to AWS, use `managerinit_noaws` to disable all AWS communication steps:
 ```
 [root@ba58e3742eae firesim]# firesim managerinit
 or
 [root@ba58e3742eae firesim]# echo "user@address.com" | firesim managerinit
 or
 [root@ba58e3742eae firesim]# echo "" | firesim managerinit
+or
+[root@ba58e3742eae firesim]# firesim managerinit_noaws
+```
+
+### No AWS Flow
+
+At this point, you should also modify `firesim/deploy/config_build.ini` to disable AWS connections if necessary.
+Modify the `enableaws` option in the `[afibuild]` section as shown:
+```
+[afibuild]
+
+s3bucketname=firesim-localuser
+buildinstancemarket=ondemand
+spotinterruptionbehavior=terminate
+spotmaxprice=ondemand
+postbuildhook=
+enableaws=false
 ```
 
 ## Build an AFI
@@ -160,9 +180,14 @@ Now launch the build. It takes about 5-6 hours:
 
 At the end of the build process, assuming your AWS credentials are still valid, FireSim will submit your Vivado checkpoint to AWS for final encryption and packaging. 
 You'll see a continuous stream of `Pending...` messages while this is happening. It can take up to an hour.
+If you provided an email address during the `managerinit` task, you'll also receive an e-mail when the build is finished with the configuration blurb to add to `firesim/deploy/config_hwdb.ini`.
+It will also be printed in the terminal window and saved to a file in `firesim/deploy/built-hwdb-entries`.
 
-If you provided an email address during the `managerinit` task, you'll also receive an e-mail when the build is finished with the configuration blurb to add to `~/firesim/deploy/config_hwdb.ini`.
-It will also be printed in the terminal window and saved to a file in `~/firesim/deploy/built-hwdb-entries`.
+If you opted for disabling AWS, firesim will output information about continuing the build process on a AWS-connected computer.
+Copy the checkpoint file to S3 as described and run the provided `aws ec2` command to start the AFI generation process. Generating
+an AFI from a checkpoint takes up to an hour. You can add the AGFI provided by the `aws ec2` command to `firesim/deploy/config_hwdb.ini`
+to continue building the software but must wait for the process to finish before using the AFI.
+
 
 ### Update HWDB
 
@@ -217,7 +242,8 @@ The FireSim `buildlocalsw` task will populate this folder for you, currently pre
 * Generates a tgz package
 * Uploads the tgz package to AWS S3
 
-The software package uploads to `s3://firesim-localuser/swpkgs/firesim-cloudgfe-processor-PX-sw.tgz` by default.
+The software package uploads to `s3://firesim-localuser/swpkgs/firesim-cloudgfe-processor-PX-sw.tgz` by default. If you've
+disabled AWS, firesim will print out the path to the tgz file for you to manually copy.
 
 **Important** The build flow requires a consistent environment between where `firesim buildlocalsw` is run and the F1 instance.
 This means the general OS version, installed packages, and even kernel version should match as closely (or exactly) as possible.

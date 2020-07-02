@@ -271,10 +271,15 @@ def local_sw_pkg(conf, buildconfig):
     local_logged(swdir + '/../', 'rm -f {}.tgz && tar czvf {}.tgz sw/*'.format(swpkgname, swpkgname))
     rootLogger.info('Package created at {}.tgz'.format(ddir + '/results-build/' + builddir + swpkgname))
 
-    rootLogger.info("Copying to AWS S3 Bucket...")
-    s3path = 's3://{}/swpkgs/{}.tgz'.format(s3bucket, swpkgname)
-    local_logged(swdir + '/../', 'aws s3 cp {}.tgz {}'.format(swpkgname, s3path))
-    rootLogger.info('Successfully copied to {}'.format(s3path))
+    aws = conf.enable_aws
+    if aws:
+        rootLogger.info("Copying to AWS S3 Bucket...")
+        s3path = 's3://{}/swpkgs/{}.tgz'.format(s3bucket, swpkgname)
+        local_logged(swdir + '/../', 'aws s3 cp {}.tgz {}'.format(swpkgname, s3path))
+        rootLogger.info('Successfully copied to {}'.format(s3path))
+    else:
+        rootLogger.info("AWS disabled by configuration. You can manually copy the software package to AWS from this path:")
+        rootLogger.info("{}".format(ddir + '/results-build/' + builddir + swpkgname))
 
 
 @parallel
@@ -337,6 +342,9 @@ def local_build(global_build_config):
     # construct the serialized description from these tags.
     description = firesim_tags_to_description(tag_buildtriplet, tag_deploytriplet, tag_fsimcommit)
 
+    # Check if AWS is enabled
+    aws = global_build_config.enable_aws 
+        
     # if we're unlucky, multiple vivado builds may launch at the same time. so we
     # append the build node IP + a random string to diff them in s3
     global_append = "-localbuild-" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10)) + ".tar"
@@ -347,18 +355,44 @@ def local_build(global_build_config):
         rootLogger.debug(files.stderr)
         tarfile = files.split()[-1]
         s3_tarfile = tarfile + global_append
-        localcap = local('aws s3 cp ' + tarfile + ' s3://' + s3bucket + '/dcp/' + s3_tarfile, capture=True)
-        rootLogger.debug(localcap)
-        rootLogger.debug(localcap.stderr)
-        agfi_afi_ids = local("""aws ec2 create-fpga-image --input-storage-location Bucket={},Key={} --logs-storage-location Bucket={},Key={} --name "{}" --description "{}" """.format(s3bucket, "dcp/" + s3_tarfile, s3bucket, "logs/", afiname, description), capture=True)
-        rootLogger.debug(agfi_afi_ids)
-        rootLogger.debug(agfi_afi_ids.stderr)
-        rootLogger.debug("create-fpge-image result: " + str(agfi_afi_ids))
-        ids_as_dict = json.loads(agfi_afi_ids)
-        agfi = ids_as_dict["FpgaImageGlobalId"]
-        afi = ids_as_dict["FpgaImageId"]
-        rootLogger.info("Resulting AGFI: " + str(agfi))
-        rootLogger.info("Resulting AFI: " + str(afi))
+        if aws:
+            localcap = local('aws s3 cp ' + tarfile + ' s3://' + s3bucket + '/dcp/' + s3_tarfile, capture=True)
+            rootLogger.debug(localcap)
+            rootLogger.debug(localcap.stderr)
+            agfi_afi_ids = local("""aws ec2 create-fpga-image --input-storage-location Bucket={},Key={} --logs-storage-location Bucket={},Key={} --name "{}" --description "{}" """.format(s3bucket, "dcp/" + s3_tarfile, s3bucket, "logs/", afiname, description), capture=True)
+            rootLogger.debug(agfi_afi_ids)
+            rootLogger.debug(agfi_afi_ids.stderr)
+            rootLogger.debug("create-fpga-image result: " + str(agfi_afi_ids))
+            ids_as_dict = json.loads(agfi_afi_ids)
+            agfi = ids_as_dict["FpgaImageGlobalId"]
+            afi = ids_as_dict["FpgaImageId"]
+            rootLogger.info("Resulting AGFI: " + str(agfi))
+            rootLogger.info("Resulting AFI: " + str(afi))
+        else:
+            rootLogger.info("")
+            rootLogger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            rootLogger.info("!! AWS disabled by configuration.                  !!")
+            rootLogger.info("!! Not uploading checkpoint to S3 or creating AFI. !!")
+            rootLogger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            rootLogger.info("")
+            rootLogger.info("To create an AFI, copy the file below to S3:")
+            rootLogger.info("File to Copy: firesim/deploy/results-build/{}/build/checkpoints/to_aws/{}".format(builddir, tarfile))
+            rootLogger.info("")
+            rootLogger.info("Example of copying to S3 bucket:")
+            rootLogger.info("Command: aws s3 cp {} s3://mys3bucket/dcp/{}".format(tarfile, s3_tarfile))
+            rootLogger.info("")
+            rootLogger.info("Then have AWS create the AFI:")
+            rootLogger.info("Command: aws ec2 create-fpga-image --input-storage-location Bucket=mys3bucket,Key=dcp/{} --logs-storage-location Bucket=mys3bucket,Key=logs/ --name \"{}\"".format(s3_tarfile, afiname))
+            rootLogger.info("")
+            rootLogger.info("The output of that command will contain the AGFI and AFI for your chosen region")
+            rootLogger.info("Local build complete - please finish generating the AFI using an AWS-connected machine")
+            rootLogger.info("")
+            rootLogger.info("")
+
+
+    # skip the remainder of the script if not using AWS
+    if not aws:
+        return
 
     rootLogger.info("Waiting for create-fpga-image completion.")
     results_build_dir = """{}/results-build/{}/""".format(ddir, builddir)
