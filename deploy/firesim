@@ -29,7 +29,7 @@ from util.streamlogger import StreamLogger
 ## below are tasks that users can call
 ## to add a task, add it here and to the choices array
 
-def managerinit():
+def managerinit(aws=True):
     """ Setup local FireSim manager components. """
 
     def valid_aws_configure_creds():
@@ -51,19 +51,20 @@ def managerinit():
             return False
         return True
 
-    valid_creds = valid_aws_configure_creds()
-    while not valid_creds:
-        # only run aws configure if we cannot already find valid creds
-        # this loops calling valid_aws_configure_creds until
-        rootLogger.info("Running aws configure. You must specify your AWS account info here to use the FireSim Manager.")
-        # DO NOT wrap this local call with StreamLogger, we don't want creds to get
-        # stored in the log
-        local("aws configure")
-
-        # check again
+    if aws:
         valid_creds = valid_aws_configure_creds()
-        if not valid_creds:
-            rootLogger.info("Invalid AWS credentials. Try again.")
+        while not valid_creds:
+            # only run aws configure if we cannot already find valid creds
+            # this loops calling valid_aws_configure_creds until
+            rootLogger.info("Running aws configure. You must specify your AWS account info here to use the FireSim Manager.")
+            # DO NOT wrap this local call with StreamLogger, we don't want creds to get
+            # stored in the log
+            local("aws configure")
+
+            # check again
+            valid_creds = valid_aws_configure_creds()
+            if not valid_creds:
+                rootLogger.info("Invalid AWS credentials. Try again.")
 
     rootLogger.info("Backing up initial config files, if they exist.")
     config_files = ["build", "build_recipes", "hwdb", "runtime"]
@@ -83,12 +84,13 @@ def managerinit():
             rootLogger.debug(m)
             rootLogger.debug(m.stderr)
 
-    useremail = raw_input("If you are a new user, supply your email address [abc@xyz.abc] for email notifications (leave blank if you do not want email notifications): ")
-    if useremail != "":
-        subscribe_to_firesim_topic(useremail)
-    else:
-        rootLogger.info("You did not supply an email address. No notifications will be sent.")
-    rootLogger.info("FireSim Manager setup completed.")
+    if aws:
+        useremail = raw_input("If you are a new user, supply your email address [abc@xyz.abc] for email notifications (leave blank if you do not want email notifications): ")
+        if useremail != "":
+            subscribe_to_firesim_topic(useremail)
+        else:
+            rootLogger.info("You did not supply an email address. No notifications will be sent.")
+        rootLogger.info("FireSim Manager setup completed.")
 
 def infrasetup(runtime_conf):
     """ do infrasetup. """
@@ -162,7 +164,8 @@ def buildlocalafi(globalbuildconf):
 
 def buildlocalsw(globalbuildconf):
     """ Build a distributable software package for the current build target """
-    auto_create_bucket(globalbuildconf.s3_bucketname)
+    if globalbuildconf.enable_aws:
+        auto_create_bucket(globalbuildconf.s3_bucketname)
     for buildconf in globalbuildconf.get_builds_list():
         execute(local_sw_pkg, globalbuildconf, buildconf, hosts=['localhost'])
 
@@ -203,6 +206,9 @@ def shareagfi(buildconf):
     """ Share the agfis specified in the [agfistoshare] section with the users
     specified in the [agfisharing] section """
     # share the image with all users
+    if not buildconf.enable_aws:
+        rootLogger.exception("Cannot share AFIs while AWS is disabled!")
+        raise Exception
     for agfiname in buildconf.agfistoshare:
         agfi = buildconf.hwdb.get_runtimehwconfig_from_name(agfiname).agfi
 
@@ -218,6 +224,7 @@ def construct_firesim_argparser():
     parser.add_argument('task', type=str,
                         help='Management task to run.', choices=[
                             'managerinit',
+                            'managerinit_noaws',
                             'buildafi',
                             'buildlocalafi',
                             'buildlocalsw',
@@ -282,6 +289,9 @@ def main(args):
     # tasks that have a special config/dispatch setup
     if args.task == 'managerinit':
         managerinit()
+
+    if args.task == 'managerinit_noaws':
+        managerinit(aws=False)
 
     if args.task == 'buildafi' or args.task == 'shareagfi' or args.task == 'buildlocalafi':
         buildconfig = GlobalBuildConfig(args)

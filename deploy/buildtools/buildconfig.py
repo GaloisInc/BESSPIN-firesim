@@ -94,6 +94,8 @@ class GlobalBuildConfig:
         self.s3_bucketname = \
             global_build_configfile.get('afibuild', 's3bucketname')
 
+        self.enable_aws = global_build_configfile.getboolean('afibuild', 'enableaws')
+
         aws_resource_names_dict = aws_resource_names()
         if aws_resource_names_dict['s3bucketname'] is not None:
             # in tutorial mode, special s3 bucket name
