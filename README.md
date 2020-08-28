@@ -161,7 +161,7 @@ Now define your build tag in `~/firesim/deploy/config_build.ini`:
 ```
 [builds]
 # this section references builds defined in config_build_recipes.ini
-# if you add a build here, it will be built when you run buildafi
+# if you add a build here, it will be built when you run buildafi or buildlocalafi
 #firesim-cloudgfe-chisel-p2
 #firesim-cloudgfe-chisel-p1
 firesim-cloudgfe-bluespec-p2
@@ -173,7 +173,7 @@ automatically share the final AFIs with any accounts listed in the `sharewithacc
 
 Now launch the build. It takes about 5-6 hours:
 ```
-[root@ba58e3742eae firesim]# firesim buildafi
+[root@ba58e3742eae firesim]# firesim buildlocalafi
 ```
 
 At the end of the build process, assuming your AWS credentials are still valid, FireSim will submit your Vivado checkpoint to AWS for final encryption and packaging. 
