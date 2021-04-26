@@ -1,4 +1,4 @@
-# CloudGFE FireSim - On Prem
+# BESSPIN CloudGFE FireSim - On Prem
 
 ## Contents
 
@@ -47,11 +47,11 @@ There are now quick-setup packages available that use pre-built Linux/FreeBSD im
 
 Two docker containers have been created to make running FireSim on premises easier.
 
-The first, `artifactory.galois.com:5008/firesim:runtime`, contains all the necessary packages for running FireSim scripts, building netlists from Chisel, and compiling support software (host-side communication binaries, kernel modules, etc).
+The first, `galoisinc/besspin:firesim`, contains all the necessary packages for running FireSim scripts, building netlists from Chisel, and compiling support software (host-side communication binaries, kernel modules, etc).
 
-The second, `artifactory.galois.com:5008/firesim:bitstream_gen`, contains the correct version of Vivado and the AWS F1 license to build the Vivado design files for AWS to convert into AFIs.
+The second, `artifactory.galois.com:5008/vivado-sdk-2018-3`, contains the correct version of Vivado and the AWS F1 license to build the Vivado design files for AWS to convert into AFIs.
 
-It is possible to run this version of FireSim without either of these docker containers, but that process is not documented here. See [the docker build scripts](https://gitlab-ext.galois.com/ssith/docker-tools) for an example of the environment you'll need to create.
+It is possible to run this version of FireSim without either of these docker containers, but that process is not documented here. See [the docker build scripts](https://github.com/GaloisInc/BESSPIN-Environment/tree/master/docker) for an example of the environment you'll need to create.
 
 **Note** It is assumed the environment you are running FireSim in matches that of the F1 instances you'll eventually use. For example, if you run this on Debian Buster, you'll need to set the F1 instance's AMI to match. The `runtime` docker container has been carefully matched to the `FPGA Developer 1.6.0` AMI.
 
